@@ -43,7 +43,7 @@ NUMBER_RE = re.compile(
     r"(?:%|k\b|x\b|hrs?\b|hours?\b|mins?\b|minutes?\b"  # without a unit
     r"|days?\b|weeks?\b|months?\b|years?\b)?",
     re.IGNORECASE)
-PROPER_RE = re.compile(r"(?<!^)\b[A-Z][a-z]{2,}\b")
+CAP_RE = re.compile(r"\b[A-Z][a-z]{2,}\b")
 HASHTAG_RE = re.compile(r"(?:^|\s)#\w+")
 EMOJI_RE = re.compile(r"[\U0001F300-\U0001FAFF☀-➿]")
 
@@ -113,6 +113,25 @@ def clamp(n):
     return max(0.0, min(100.0, n))
 
 
+def sentence_starts(text):
+    """Character offsets where a sentence begins: the start, and after . ! ? or a newline."""
+    starts = {0}
+    for m in re.finditer(r"(?:[.!?]+[\"'”’)]*\s+|\n\s*)", text):
+        starts.add(m.end())
+    # A leading quote or bracket does not move the start of the sentence.
+    return starts | {s + 1 for s in starts if s < len(text) and text[s] in "\"'“‘("}
+
+
+def proper_nouns(text):
+    """Capitalised words that are not the first word of a sentence.
+
+    A capital after a full stop is grammar, not a name: "It works. Then
+    everything changed." has nothing concrete in it.
+    """
+    starts = sentence_starts(text)
+    return [m.group(0) for m in CAP_RE.finditer(text) if m.start() not in starts]
+
+
 def words(text):
     # "$18,000" is one word when it is spoken, so it is one word here too.
     return WORD_RE.findall(re.sub(r"(?<=\d),(?=\d)", "", text))
@@ -138,7 +157,7 @@ def check_length(text):
 def check_specificity(text):
     """One concrete thing beats three abstract ones."""
     nums = [n.strip() for n in NUMBER_RE.findall(text) if n.strip()]
-    propers = set(PROPER_RE.findall(text))
+    propers = set(proper_nouns(text))
     low = [w.lower().strip("'’") for w in words(text)]
     spoken = [w for w in low if w in SPOKEN_NUMBERS or w in MONEY_WORDS]
     hits = len(nums) + len(propers) + len(spoken)
@@ -162,23 +181,31 @@ def check_stakes(text):
     return clamp(score), detail
 
 
+def _name_token(token):
+    """"Dana's" -> "Dana", so a possessive still counts as the name."""
+    m = CAP_RE.match(token)
+    return m.group(0) if m else None
+
+
 def check_frontload(text):
     """The interesting word cannot be in position nine."""
     w = words(text)
     if not w:
         return 0.0, "empty"
     low = [x.lower().strip("'’") for x in w]
-    opener = " ".join(low[:2])
     penalty = 0
     hit_opener = None
     for weak in WEAK_OPENERS:
-        if opener.startswith(weak) or low[0] == weak:
+        # Whole words only: "Social" does not open with "so".
+        parts = weak.split()
+        if low[:len(parts)] == parts:
             penalty, hit_opener = 30, weak
             break
+    names = set(proper_nouns(text))
     payload = None
     for i, token in enumerate(low):
         if (token in STAKES or token in SPOKEN_NUMBERS or token in MONEY_WORDS
-                or NUMBER_RE.match(w[i]) or (i and PROPER_RE.match(w[i]))):
+                or NUMBER_RE.match(w[i]) or (i and _name_token(w[i]) in names)):
             payload = i
             break
     if payload is None:

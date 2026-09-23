@@ -40,7 +40,24 @@ MENTION_RE = re.compile(r"(?:^|\s)(@[A-Za-z0-9_.]+)")
 LINK_RE = re.compile(r"https?://\S+|\bwww\.\S+|\b[a-z0-9-]+\.(?:com|co|io|net|org|ai|app)/\S*",
                      re.IGNORECASE)
 EMOJI_RE = re.compile(r"[\U0001F300-\U0001FAFF☀-➿←-⇿️]")
-CONCRETE_RE = re.compile(r"\$\s?\d|\b\d[\d,.]*\b|(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
+DIGIT_RE = re.compile(r"\$\s?\d[\d,]*(?:\.\d+)?|\b\d[\d,.]*\b")
+CAP_RE = re.compile(r"\b[A-Z][a-z]{2,}\b")
+WORD_RE = re.compile(r"[A-Za-z']+")
+
+# Kept here rather than imported from ig-reel so this folder runs on its own.
+# Same list as hookscore.py: spoken numbers are as concrete as digits.
+SPOKEN_NUMBERS = {
+    "zero", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    "ten", "eleven", "twelve", "fifteen", "twenty", "thirty", "forty", "fifty",
+    "sixty", "seventy", "eighty", "ninety", "hundred", "thousand", "million",
+    "billion", "dozen", "half", "twice", "triple",
+}
+# Capitalised, but not a name anybody could check.
+NOT_NAMES = {
+    "instagram", "insta", "reels", "reel", "stories", "threads", "facebook", "tiktok",
+    "youtube", "linkedin", "monday", "tuesday", "wednesday", "thursday", "friday",
+    "saturday", "sunday", "today", "tomorrow", "yesterday",
+}
 
 ASKS = [
     (re.compile(r"(?i)\bcomment (?:the word |\")?[A-Z0-9]{2,}\b"), "comment a keyword"),
@@ -56,6 +73,24 @@ ASKS = [
 FILLER_TAGS = {"#viral", "#fyp", "#explore", "#explorepage", "#foryou", "#foryoupage",
                "#trending", "#instagood", "#love", "#follow", "#like4like", "#reels",
                "#reelsinstagram", "#viralreels", "#instadaily"}
+
+
+def _sentence_starts(text):
+    starts = {0}
+    for m in re.finditer(r"(?:[.!?]+[\"'”’)]*\s+|\n\s*)", text):
+        starts.add(m.end())
+    return starts | {s + 1 for s in starts if s < len(text) and text[s] in "\"'“‘("}
+
+
+def concrete_markers(text):
+    """Numbers, spoken numbers and names. Not a capital that starts a sentence,
+    not a platform, not a day of the week."""
+    starts = _sentence_starts(text)
+    found = [m.group(0) for m in DIGIT_RE.finditer(text)]
+    found += [m.group(0) for m in CAP_RE.finditer(text)
+              if m.start() not in starts and m.group(0).lower() not in NOT_NAMES]
+    found += [w for w in (x.lower() for x in WORD_RE.findall(text)) if w in SPOKEN_NUMBERS]
+    return found
 
 
 def visible_window(text, cut):
@@ -113,9 +148,10 @@ def analyse(text, cut=TRUNCATE, keywords=None):
     else:
         add("FIRST LINE", "PASS", f"{len(first_line)} characters, lands whole")
 
-    add("HOOK IS CONCRETE", "PASS" if CONCRETE_RE.search(window) else "WARN",
-        f"{len(CONCRETE_RE.findall(window))} number(s) or name(s) in the visible window"
-        + ("" if CONCRETE_RE.search(window) else " - nothing checkable before the tap"))
+    markers = concrete_markers(window)
+    add("HOOK IS CONCRETE", "PASS" if markers else "WARN",
+        f"{len(markers)} number(s) or name(s) in the visible window"
+        + ("" if markers else " - nothing checkable before the tap"))
 
     if len(tags) > HASHTAG_LIMIT:
         add("HASHTAGS", "FAIL", f"{len(tags)} tags, over Instagram's cap of {HASHTAG_LIMIT}. "

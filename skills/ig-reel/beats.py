@@ -23,12 +23,19 @@ Usage
 
 import argparse
 import json
+import os
 import re
 import sys
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+# Same folder, so this import always resolves: one list of spoken numbers and
+# one rule for names, shared with the hook scorer.
+from hookscore import MONEY_WORDS, SPOKEN_NUMBERS, proper_nouns  # noqa: E402
+
 WORD_RE = re.compile(r"[A-Za-z0-9$%'’-]+")
 SENT_RE = re.compile(r"[^.!?]+[.!?]*")
-CONCRETE_RE = re.compile(r"\$\s?\d|\b\d[\d,.]*\b|(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
+DIGIT_RE = re.compile(r"\$\s?\d[\d,]*(?:\.\d+)?|\b\d[\d,.]*\b")
 STOPWORDS = {
     "the", "a", "an", "and", "or", "but", "if", "of", "to", "in", "on", "for",
     "with", "that", "this", "it", "is", "are", "was", "were", "be", "been",
@@ -45,6 +52,15 @@ ABSTRACT_RUN = 3         # beats in a row with nothing checkable in them.
 def words(text):
     # "$18,000" is one word when it is spoken, so it is one word here too.
     return WORD_RE.findall(re.sub(r"(?<=\d),(?=\d)", "", text))
+
+
+def concrete_markers(text):
+    """Numbers, spoken numbers and names. A capital that starts a sentence is not a name."""
+    found = [m.group(0) for m in DIGIT_RE.finditer(text)]
+    found += proper_nouns(text)
+    found += [w for w in (x.lower().strip("'’") for x in words(text))
+              if w in SPOKEN_NUMBERS or w in MONEY_WORDS]
+    return found
 
 
 def pretty(token):
@@ -98,7 +114,7 @@ def analyse(raw, wpm=165, target=None):
             "dur": round(dur, 2),
             "words": n,
             "text": text,
-            "concrete": len(CONCRETE_RE.findall(text)),
+            "concrete": len(concrete_markers(text)),
             "label": "",
             "flags": [],
         })

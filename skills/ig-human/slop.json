@@ -939,7 +939,7 @@
     },
     {
       "id": "isnt-about",
-      "regex": "(?i)\\b(?:this|it) is(?:n'?t| not) about [^.!?\\n]{2,60}[.!] it'?s about\\b",
+      "regex": "(?i)\\b(?:(?:this|it) is(?:n'?t| not)|it'?s not|this'?s not) about [^.!?\\n]{2,60}[.!,] it'?s about\\b",
       "name": "\"It isn't about X. It's about Y.\"",
       "fix": "Lead with Y. The reversal is the tell."
     },

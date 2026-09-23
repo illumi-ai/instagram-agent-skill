@@ -38,6 +38,17 @@ CONTRACTIONS = re.compile(r"\b\w+'(?:s|t|re|ve|ll|d|m)\b", re.IGNORECASE)
 PRONOUNS = re.compile(r"\b(i|me|my|mine|we|us|our|you|your)\b", re.IGNORECASE)
 NUMBERS = re.compile(r"\b\d[\d,.]*%?\b|\$\d")
 PROPER = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
+QUOTES = str.maketrans({"\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"', "\u2032": "'"})
+
+
+def normalize_quotes(text):
+    """Straight quotes, for the structural scan only.
+
+    "It’s not just X, it’s Y" with a curly apostrophe is the same tell as the
+    straight version. FINGERPRINT still reads the original text, where the
+    curly quote is itself a signal.
+    """
+    return text.translate(QUOTES)
 
 
 def clamp(n):
@@ -120,6 +131,7 @@ def check_fingerprint(text):
 
 def check_voice(text, lex):
     """Contractions, person, and the shapes models default to."""
+    text = normalize_quotes(text)
     w = words(text)
     if len(w) < 25:
         return 50.0, "too short to judge"
