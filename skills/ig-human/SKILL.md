@@ -11,10 +11,11 @@ description: >-
 
 # ig-human
 
-Two tools live in this folder and they both actually run. Use them. Do not
+Three tools live in this folder and they all actually run. Use them. Do not
 eyeball this.
 
 ```bash
+python3 proofcheck.py draft.txt --said said.txt   # every claim against the user's own evidence
 python3 humanize.py draft.txt --report        # clean it, show what changed
 python3 detect.py draft.txt                    # score it, five checks
 python3 detect.py before.txt after.txt         # prove the delta
@@ -35,6 +36,46 @@ essay, and a voiceover that nobody could say naturally is obvious in the first
 take. The tell here is not a detector flagging the post. The tell is a person
 scrolling past something that reads like a brand, or a creator stumbling over
 their own script.
+
+## Step 0: the proof guard
+
+Before anything else, check that the draft says nothing the user did not give
+you. Invented numbers, clients, results or shared history are the one failure
+that a clean score cannot fix.
+
+```bash
+python3 proofcheck.py draft.txt --said said.txt [--source source.txt] [-o fixed.txt]
+```
+
+- **Evidence is only four things:** the bullets under `## Proof I can use` in
+  `~/.claude/instagram/voice.md`, the name and handle under `## Who I am`,
+  what the user said in this session, and the user's own source material
+  (`--source`, for `/ig-repurpose`). Comments, DMs they received and other
+  people's words are never evidence.
+- **`said.txt` is the user's own messages from this session, copied word for
+  word**, one per line, into a temporary file. Never paraphrase them and never
+  add anything the user did not type.
+- **What the statuses mean and what to do:**
+
+  | status | meaning | do |
+  | --- | --- | --- |
+  | BACKED / CHECKED | traced to one piece of evidence | keep |
+  | DERIVED | a number worked out from the proof (5 hours to 20 minutes is "15 times faster") | keep, and read it once |
+  | UNBACKED | no evidence reports it | ask the user, or cut it |
+  | MISMATCH | the matching proof says a different number | use the proof's number, or cut it |
+  | EMBELLISHED | says more than the proof does | ask about the extra, or cut it |
+  | UNVERIFIED | offline, and nothing in the evidence mentions it | ask the user, or cut it |
+  | FLAGGED | offline, a number or name is not in the evidence | ask the user, or cut it |
+
+  Never "fix" a flag by inventing a better-sounding fact. `-o` writes the
+  draft with `{{your number}}` and `{{client name}}` in place of exactly the
+  flagged spans; that is the safe version to show.
+- **The first line says which engine decided.** `engine: jev-1.13.0 (...)`
+  means TypeSafe's Jev model read the sentences; `engine: heuristic (...)`
+  means only the code checks ran (no key, offline, or `IG_JEV=off`). The
+  thresholds are provisional. Never compare results across engines.
+- **Stop after two rounds.** Rewrite, re-run once. If flags remain after the
+  second run, show them to the user with the draft and let them decide.
 
 ## What gets fixed automatically
 
@@ -93,7 +134,10 @@ below 55.
 ## Say this honestly
 
 These are five local heuristics modelled on the signals public detectors key
-on. They run entirely on the user's machine and nothing is uploaded. They are
+on. They run entirely on the user's machine and nothing is uploaded. (The
+proof guard is different: with Jev on, it sends the draft's sentences and the
+evidence it is checked against to TypeSafe. The README lists exactly what
+leaves the machine.) They are
 **not** GPTZero, Originality, Copyleaks, Winston or Turnitin, they do not call
 those APIs, and they cannot promise those verdicts. Fixing what they measure
 does tend to move those numbers, because they are measuring the same underlying
@@ -102,6 +146,8 @@ do not tell a user their text is undetectable.
 
 ## Order of operations
 
+0. `proofcheck.py draft.txt --said said.txt`, and resolve every flag with the
+   user (two rounds at most, see Step 0).
 1. `humanize.py draft.txt -o clean.txt --report`
 2. Read the structural flags. Rewrite those lines yourself.
 3. `detect.py draft.txt clean.txt` to show the before and after.

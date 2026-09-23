@@ -63,9 +63,15 @@ nothing else does.
 three formulas that genuinely fit it, and write the spoken line plus the
 on-screen line for each. Different formulas, not three rewrites of one.
 
-**2. Score them.** Put the three spoken lines in a file, one per line, and run
-`hookscore.py`. Show the user the ranking. If the top one is under 50, you do
-not have the hook yet and no amount of editing fixes that.
+Put the three spoken lines in `hooks.txt`, one per line, and check them
+against the proof: `python3 ../ig-human/proofcheck.py hooks.txt --said said.txt`
+(see `/ig-human`, Step 0). A hook that comes back UNBACKED, MISMATCH or
+EMBELLISHED is rewritten from the proof or dropped, never kept with an invented
+number.
+
+**2. Score them.** Run `hookscore.py hooks.txt`. Show the user the ranking.
+If the top one is under 50, you do not have the hook yet and no amount of
+editing fixes that.
 
 **3. Write the script** on the winning hook. Plain spoken language, the way the
 user actually talks. Contractions. Short lines. No sentence they would have to
@@ -75,8 +81,10 @@ rehearse.
 a hook past 3 seconds, any beat over 4 seconds, a run of beats with nothing
 concrete in them, no loop. Re-run until it is clean.
 
-**5. Humanize it.** Run the script through `/ig-human` before showing it. A
-written-sounding line is obvious the moment someone says it out loud.
+**5. Humanize it.** Run the script through `/ig-human` before showing it,
+starting with its proof guard: `python3 ../ig-human/proofcheck.py script.txt
+--said said.txt`. A written-sounding line is obvious the moment someone says it
+out loud, and an invented one is worse.
 
 **6. Print the block.** The script in a fenced block, the on-screen text as a
 separate list with timings, and then:
@@ -87,6 +95,7 @@ hook:       #3 Nobody Tells You, scored 86 STRONG
 length:     28.4s across 9 beats at 165 wpm
 on-screen:  6 cards
 humanizer:  4 artefacts stripped, human score 81 PASS
+proof:      3 backed, 0 {{…}}, 0 to confirm · engine jev-1.13.0
 caption:    run /ig-caption next
 
 Reply "yes" to log it, or tell me what to change.

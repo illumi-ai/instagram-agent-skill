@@ -45,5 +45,26 @@ class Phase0Docs(unittest.TestCase):
         self.assertIn("Proof I can use", text)
 
 
+
+class ProofGuardWired(unittest.TestCase):
+    def test_ig_human_step_0_and_round_limit(self):
+        human = read("ig-human/SKILL.md")
+        self.assertIn("python3 proofcheck.py", human)
+        self.assertIn("## Step 0: the proof guard", human)
+        self.assertIn("two rounds", human)
+        self.assertIn("IG_JEV=off", human)
+
+    def test_reel_story_reply(self):
+        reel = read("ig-reel/SKILL.md")
+        self.assertIn("proofcheck.py", reel)
+        self.assertRegex(reel, r"proof:\s+\d+ backed, \d+ \{\{…\}\}, \d+ to confirm · engine")
+        for rel in ("ig-story/SKILL.md", "ig-reply/SKILL.md"):
+            self.assertIn("../ig-human/proofcheck.py", read(rel), rel)
+
+    def test_voice_template_asks_for_checkable_facts(self):
+        tmpl = open(os.path.join(ROOT, "templates", "voice.md"), encoding="utf-8").read()
+        self.assertIn("One checkable fact per bullet", tmpl)
+
+
 if __name__ == "__main__":
     unittest.main()

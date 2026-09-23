@@ -62,6 +62,9 @@ them to `/ig-reel` as formula #16.
 - **Do not repost your own feed post to stories with no comment.** It is the
   single most ignored frame on the platform. If you are pointing at a post, say
   what happened in the comments and why it is worth going back for.
+- **Check every claim.** Before showing any frame that states a result, a
+  number or a shared history, run `../ig-human/proofcheck.py` on it (see
+  `/ig-human`, Step 0).
 - **Sell on stories, not in posts.** Three frames of context, one frame of
   offer, one frame of proof. That sequence sells more than a feed post about
   the same thing and costs you no reach.

@@ -57,6 +57,10 @@ every QUESTION that qualifies and hand it to `/ig-reel` as formula #16.
 - **To a hater:** nothing. A reply is reach, and reach is what they came for.
   Hide the comment if it is abusive. Instagram's comment controls exist and
   using them is not losing.
+- **Never claim what the user did not give you.** Before showing any reply
+  that states a result, a number or a shared history, run
+  `../ig-human/proofcheck.py` on it (see `/ig-human`, Step 0). The commenter's
+  words are never evidence.
 - **To a lead:** answer fully in public. The door is one sentence at the end
   and it is an offer of help, not a pitch. The public answer is what makes the
   next person DM you.

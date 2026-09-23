@@ -56,6 +56,11 @@ Real numbers, outcomes and stories I am happy to put my name on. The skills will
 never invent one, so if this section is empty, every draft comes back with
 `{{your number}}` in it.
 
+One checkable fact per bullet: what happened, the number, when. `proofcheck.py`
+matches every claim in a draft against these lines one by one, so "Cut proposal
+time from 5 hours to 20 minutes with one template, 2024" works and "lots of
+happy clients" does not.
+
 -
 -
 -
