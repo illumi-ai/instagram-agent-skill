@@ -40,6 +40,20 @@ class Split(unittest.TestCase):
         self.assertEqual(s, ["He wrote “follow me. please.” and I laughed."])
 
 
+class SplitReview(unittest.TestCase):
+    def test_inch_mark_is_not_a_quote(self):
+        s = cap.split_sentences('My 12" ring light changed everything. Comment LIGHT for the link. '
+                                'Save this for later.')
+        self.assertEqual(len(s), 3)
+
+    def test_two_asks_joined_by_and_are_split_but_stories_are_not(self):
+        self.assertEqual(cap.split_sentences("Save this and share it with a friend who freelances."),
+                         ["Save this", "share it with a friend who freelances."])
+        self.assertEqual(cap.split_sentences("I had to follow my gut and walk away from the deal."),
+                         ["I had to follow my gut and walk away from the deal."])
+        self.assertEqual(len(cap.split_sentences('She said "save this and share it." and left.')), 1)
+
+
 class Questions(unittest.TestCase):
     def test_two_questions_per_sentence(self):
         q = cap.ask_questions(["Save this.", "I rebuilt it."])
@@ -90,6 +104,12 @@ class Asks(unittest.TestCase):
         a = cap.analyse("Save this. Save it for later.\nFollow for part 2.")
         self.assertEqual(a["asks"], ["save", "follow"])
         self.assertEqual(self.one_ask(a)["status"], "WARN")
+
+    def test_two_asks_in_one_sentence_warn(self):
+        jev.set_transport(transport({"Save this": (0.9, "save"), "share it": (0.9, "share_or_send")}))
+        a = cap.analyse("The template is below.\nSave this and share it with a friend who freelances.")
+        self.assertEqual(self.one_ask(a)["status"], "WARN")
+        self.assertEqual(a["asks"], ["save", "share_or_send"])
 
     def test_borderline_is_reported_never_fail(self):
         jev.set_transport(transport({"Save this": (0.9, "save"), "Thoughts": (0.5, "comment_reply")}))

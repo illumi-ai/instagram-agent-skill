@@ -147,12 +147,52 @@ def concrete_markers(text):
     return found
 
 
+# "Save this and share it with a friend" is two asks in one sentence. Split
+# before "and" only when an ask verb follows, so a story ("I had to follow my
+# gut and walk away") stays whole.
+ASK_VERBS = (r"save|share|send|tag|follow|comment|dm|message|tap|swipe|click|grab|download|"
+             r"tell|drop|hit|check|join|subscribe|turn|type|reply|repost|visit|book|sign")
+AND_ASK_RE = re.compile(r",?\s+(?:and|&|then)\s+(?=(?:" + ASK_VERBS + r")\b)", re.IGNORECASE)
+
+
 def split_sentences(text):
     """Sentences of the caption, lines of only hashtags or mentions dropped.
 
     A quoted passage stays inside its sentence: "she said "share it. now." and
     left." is one sentence, because the quote is reported speech, not an ask.
+    A straight quote after a digit (12" ring light) is an inch mark, not a quote.
+    Two asks joined by "and" become two sentences.
     """
+    out = []
+    for piece in _split_quoted(text):
+        out += [p.strip() for p in _split_outside_quotes(piece) if p.strip()]
+    return out
+
+
+def _split_outside_quotes(sentence):
+    parts, last = [], 0
+    for m in AND_ASK_RE.finditer(sentence):
+        if not _quote_balance(sentence[:m.start()]):
+            parts.append(sentence[last:m.start()])
+            last = m.end()
+    parts.append(sentence[last:])
+    return parts
+
+
+def _quote_balance(text):
+    """1 while inside a quoted passage, 0 outside it."""
+    quoted = False
+    for i, ch in enumerate(text):
+        if ch == '"' and (quoted or i == 0 or text[i - 1] in " \t([{"):
+            quoted = not quoted
+        elif ch == "\u201c":
+            quoted = True
+        elif ch == "\u201d":
+            quoted = False
+    return int(quoted)
+
+
+def _split_quoted(text):
     out = []
     for line in text.split("\n"):
         if not line.strip() or TAG_LINE_RE.match(line):
@@ -161,7 +201,7 @@ def split_sentences(text):
         while i < len(line):
             ch = line[i]
             buf += ch
-            if ch == '"':
+            if ch == '"' and (quoted or i == 0 or line[i - 1] in " \t([{"):
                 quoted = not quoted
             elif ch == "\u201c":
                 quoted = True
