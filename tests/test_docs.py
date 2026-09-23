@@ -100,5 +100,39 @@ class CaptionWired(unittest.TestCase):
         self.assertIn("IG_JEV=off", text)
 
 
+
+class ProjectDocs(unittest.TestCase):
+    def test_readme_says_what_leaves_the_machine(self):
+        readme = read_path(os.path.join(ROOT, "README.md"))
+        self.assertIn("## What leaves your machine", readme)
+        self.assertNotIn("nothing uploaded", readme.lower())
+        self.assertIn("IG_JEV=off", readme)
+        self.assertIn("measured on v1.0", readme)
+        self.assertIn("provisional", readme)
+        self.assertIn("evals/REPORT.md", readme)
+
+    def test_manifest_version(self):
+        manifest = json.loads(read_path(os.path.join(ROOT, ".claude-plugin", "plugin.json")))
+        self.assertEqual(manifest["version"], "1.1.0")
+        self.assertEqual(manifest["author"]["name"], "Jake Schincariol")
+
+    def test_claude_md_sections(self):
+        claude = read_path(os.path.join(ROOT, "CLAUDE.md"))
+        for n, heading in enumerate([
+                "Visão geral e mapa das pastas", "Fluxo entre as skills e estado compartilhado",
+                "Regras invioláveis", "Arquitetura Jev", "Contrato do motor e exit codes",
+                "Cliente e portabilidade", "Regras de desenho de perguntas", "Privacidade",
+                "Testes e evals", "Estilo", "Fluxo Git", "Registro das decisões Pro × Contra",
+                "Checklist para adicionar um novo uso do Jev", "Próxima fase e critério de entrada"], 1):
+            self.assertIn(f"## {n}. {heading}", claude)
+        self.assertIn('MODEL = "jev-1.13.0"', claude)
+        self.assertNotIn('"jev-latest"', claude)
+
+    def test_model_is_pinned_everywhere(self):
+        for rel in ("ig-human/jev.py", "ig-human/proofcheck.py", "ig-reel/formula.py",
+                    "ig-reel/fit.py", "ig-caption/caption.py", "ig-viral/swipe.py"):
+            self.assertNotIn('"jev-latest"', read(rel), rel)
+
+
 if __name__ == "__main__":
     unittest.main()

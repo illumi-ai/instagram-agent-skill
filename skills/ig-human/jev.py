@@ -322,10 +322,3 @@ def engine_fields(result=None, error=None):
         reason, detail = str(error or "disabled"), ""
     return {"engine": "heuristic", "engine_reason": reason, "engine_detail": detail or None,
             "model": None, "usage": None, "requests": 0}
-
-
-def unavailable(error):
-    """(reason, detail) from a JevUnavailable, or from the name of a reason."""
-    if isinstance(error, JevUnavailable):
-        return error.reason, error.detail
-    return str(error), ""

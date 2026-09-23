@@ -1,7 +1,9 @@
 # The Instagram agent skill
 
-Thirteen Claude skills that run an Instagram account. Free, MIT, no signup, no
-API key, nothing to connect.
+Thirteen Claude skills that run an Instagram account. Free, MIT, no signup,
+nothing to connect. An optional TypeSafe API key makes four decisions sharper
+(see [Decisions checked by Jev](#decisions-checked-by-jev-optional)), and
+everything runs without it.
 
 One of them writes your Reels off 26 hook formulas and scores the hook before
 you waste a take on it. One goes and finds the reels that are actually working
@@ -43,8 +45,8 @@ Or as a plugin:
 
 Project-local instead of global: copy the same folders into your repo's
 `.claude/skills/`. No Claude Code at all? Paste any single `SKILL.md` at the top
-of a chat and it runs as a mode. You lose the five Python tools, which is most
-of the point of `/ig-reel` and `/ig-human`, but the rest works.
+of a chat and it runs as a mode. You lose the Python tools, which are most of
+the point of `/ig-reel` and `/ig-human`, but the rest works.
 
 Then spend ten minutes on `templates/voice.md`. Copy it to
 `~/.claude/instagram/voice.md` and fill it in, or send Claude three of your own
@@ -63,17 +65,20 @@ out loud.
 | `/ig-story` | The daily story sequence, which sticker does which job, and the DM funnel that starts with them moving first. |
 | `/ig-profile` | Scores your profile against a [12-part rubric](skills/ig-profile/rubric.json) out of 100, then rewrites in fix-first order. |
 | `/ig-plan` | The week. What to post, which format, when, and the 10 accounts to engage with. |
-| `/ig-human` | The humanizer. Two scripts that actually run. See below. |
+| `/ig-human` | The humanizer and the proof guard. Three scripts that actually run. See below. |
 | `/ig-comment` | Comments on other people's posts. Nine types, picked by what the post actually is. Never "🔥🔥🔥". |
 | `/ig-reply` | The thread under your own post. Sorts into keyword / lead / substance / question / support / noise, then writes in that order. |
 | `/ig-dm` | The keyword delivery, the first message, the collab pitch, and the two follow-ups. Two. |
 | `/ig-repurpose` | One video, podcast or newsletter into a week of reels and carousels that each stand alone. |
 | `/ig-audit` | Post-mortem on what you already posted. Ranks by outlier multiple and sends per reach, not views. |
 
-## The five tools that actually run
+## The tools that actually run
 
-No dependencies, no network, nothing uploaded. They run on your machine, on
-your text.
+No dependencies: standard-library Python only. Without a TypeSafe key they
+run entirely on your machine, on your text, and nothing leaves it. With
+`TYPESAFE_API_KEY` set, four of them also ask TypeSafe's Jev model for one
+narrow judgment each, and [What leaves your machine](#what-leaves-your-machine)
+lists exactly what that sends. `IG_JEV=off` turns it off.
 
 ### Hooks
 
@@ -209,6 +214,8 @@ names the hook formula, and prints what separates the top third from the
 bottom third.
 
 ```
+engine: heuristic (no-key)
+
 SWIPE FILE  ·  4 reels  ·  4 accounts  ·  baseline: account median
 ==============================================================================
     60.0x  hook  57  #9  The Steal              @c                 180,000
@@ -219,7 +226,75 @@ SWIPE FILE  ·  4 reels  ·  4 accounts  ·  baseline: account median
            "in this video I am going to show you my morning routine"
 ```
 
+## Decisions checked by Jev (optional)
+
+Four decisions in this pack used to be a regex or the model's own judgment in
+the moment. With `TYPESAFE_API_KEY` in the environment, each one is now also
+asked of [Jev](https://docs.typesafe.ai), TypeSafe's System One model pinned
+at `jev-1.13.0`: it answers typed questions (yes/no probabilities, one of a
+set) in well under a second, and never writes text. Code keeps the policy, the
+thresholds and all of the arithmetic. Every report says on its first line which
+engine decided:
+
+```
+engine: jev-1.13.0 (1 req, 2,089 tok, 0.4s)
+engine: heuristic (no-key)
+```
+
+| script | the question Jev answers | what code does with it |
+| --- | --- | --- |
+| `ig-human/proofcheck.py` | what kind of statement each sentence is; which evidence item reports the same event; whether that item states everything the sentence does | every number and name is still checked in code; Jev can add a flag, never remove one |
+| `ig-reel/formula.py` (and `swipe.py`) | which of the 26 formulas a hook follows, and whether it has a hook's shape at all | a formula counts only when the regex and Jev agree, or the regex found nothing and Jev is sure |
+| `ig-reel/fit.py` | whether a true hook in each formula's shape can be written from the idea alone | only WRITABLE formulas get written; the rest become questions or are vetoed |
+| `ig-caption/caption.py` | whether each sentence asks the reader to do something, and what | the one-ask rule stays in code, and a Jev reading is at most a WARN |
+
+All four are **provisional**. The thresholds (0.50, 0.85, 0.25 and so on) are
+named constants at the top of each script, set on small sets that the agents
+who built the features also labelled. [`evals/REPORT.md`](evals/REPORT.md) has
+the numbers, and says what they do not show. On those sets, for example, the
+caption asks went from 8/24 with the regex to 24/24, and the proof guard's
+recall went from 0.54 with code alone to 1.0 at one false positive in 25. Treat
+that as a smoke test, not a benchmark.
+
+Without the key, offline, rate limited, or with `IG_JEV=off` / `--engine off`,
+every script falls back to exactly what it did before and says so. `fit.py`
+has no code fallback and prints `fit: skipped`. Never compare results across
+engines.
+
+## What leaves your machine
+
+Only with `TYPESAFE_API_KEY` set, and only to `api.typesafe.ai`:
+
+| script | what it sends |
+| --- | --- |
+| `proofcheck.py` | the draft's sentences, the bullets under *Proof I can use* in `voice.md`, your name and handle from *Who I am*, your own words from this session (`--said`) and `--source` |
+| `formula.py` / `swipe.py` | each hook line, cut at 300 characters. Never the account, the views or the follower counts |
+| `fit.py` | the idea, cut at 1,500 characters |
+| `caption.py` | the caption's sentences, without the hashtag-only lines |
+
+- **Never sent:** *Off limits* and the rest of `voice.md`, `log.md`,
+  `plan.md`, `swipe.md`, and the key itself anywhere but the request header.
+- **Other people's words that are sent:** the public hooks of the creators in
+  your swipe TSV, and a recipient's name or handle when it appears in a DM
+  draft you run through `proofcheck.py`.
+- **Turning it off:** `IG_JEV=off` in your environment, or `--engine off` on
+  any script. Without the key nothing is sent.
+- **Retention:** TypeSafe states that Jev is not trained on customer requests
+  or responses. Zero data retention is offered to enterprise customers; check
+  TypeSafe's [legal page](https://docs.typesafe.ai) for the DPA and the
+  current terms before sending client material.
+
+## Tests and evals
+
+```bash
+python3 -m unittest discover -s tests -t .       # offline: the network is blocked in tests
+python3 evals/run.py --suite all                  # replays recorded Jev answers, no network
+python3 evals/run.py --suite all --live           # asks Jev again (needs the key, costs cents)
+```
+
 ## What I actually measured, which is the part worth reading
+
+*Everything in this section was measured on v1.0.*
 
 I did not want to publish a hook scorer on the claim that it feels right, so I
 tested it. The corpus is **74 real short-form hooks**: the first three seconds
@@ -235,11 +310,13 @@ and it is stated here rather than buried.
 **Three results, two of them uncomfortable:**
 
 **1. It catches bad hooks well.** Against ten hooks written deliberately badly,
-AUC 0.83, and nine of the ten scored below the median of the real corpus. If
+AUC 0.83 (measured on v1.0), and nine of the ten scored below the median of
+the real corpus. If
 your hook opens on a greeting, a preamble or nothing concrete, this tells you.
 
 **2. It does not pick winners.** Separating a good creator's hits from that
-same creator's misses: **AUC 0.56, where 0.50 is a coin flip.** Of the five
+same creator's misses: **AUC 0.56 (measured on v1.0), where 0.50 is a coin
+flip.** Of the five
 checks, only SPECIFICITY separated the bands meaningfully, by 60 points of
 median. STAKES and ADDRESS had identical medians in both bands, which means on
 this corpus they measured nothing.
@@ -252,11 +329,17 @@ your audio and who Instagram shows it to.
 **3. The formula classifier was broken and the test is what caught it.** The
 `match` regexes in `hooks.json` were written off my own templates, and they
 named **8%** of real hooks. People do not speak in templates. Rewriting them
-against actual transcribed speech took it to **49%**, and four formulas went
+against actual transcribed speech took it to **49%** (measured on v1.0), and
+four formulas went
 into the set because they kept appearing and were not there: Contrarian Flip,
 The Statistic, The Reveal, Someone Else's Result, plus The Superlative. On the
 other 51% it abstains, which is correct: a lot of short-form is podcast clips
 that have no hook formula at all.
+
+v1.1 went further: six of the regexes did not recognise their own example, and
+three matched keyword traps like "Don't steal my content". All 26 examples now
+classify as themselves, and `formula.py` checks every name with Jev when the
+key is set.
 
 One fixed bug worth naming: `SPECIFICITY` only counted digits, so "zero
 dollars" and "three marketing books" scored as having nothing concrete in them.
@@ -303,7 +386,10 @@ defeating a cryptographic watermarking scheme, and this repo does not make one.
 
 **Nothing here fabricates.** No invented metrics, clients or outcomes go under
 your name. If a draft needs a number you have not given, it comes back with
-`{{your number}}` in it and a flag, every time.
+`{{your number}}` in it and a flag, every time. `proofcheck.py` enforces it:
+every number, name and claim in a draft is traced to your *Proof I can use*
+bullets or to what you said, and anything it cannot trace comes back to you
+before the draft does.
 
 **Platform numbers go stale.** The hashtag cap moved from 30 to 5 in December
 2025 while this repo was being written, and the linter had the old number in it
@@ -314,16 +400,23 @@ doing when you read it, Instagram is right.
 
 ```
 skills/ig-reel/hooks.json          26 hook formulas: template, example, on-screen line,
-                                   what it is for, how it gets ruined, and a match regex
+                                   what it is for, how it gets ruined, a match regex,
+                                   and the facts it needs
 skills/ig-reel/hookscore.py        the five-property hook panel
 skills/ig-reel/beats.py            script to timed beat sheet
+skills/ig-reel/formula.py          formula names, regex and Jev checking each other
+skills/ig-reel/fit.py              which formulas an idea can carry without invention
 skills/ig-caption/caption.py       the truncation preview and the caption linter
 skills/ig-human/slop.json          the lexicon: 154 terms, 18 invisible classes, 16 tells
 skills/ig-human/humanize.py        the three cleaning passes
 skills/ig-human/detect.py          the five-check panel
+skills/ig-human/proofcheck.py      every claim traced to your own evidence
+skills/ig-human/jev.py             the one TypeSafe client, standard library only
 skills/ig-viral/swipe.py           outlier ranking and formula classification
 skills/ig-profile/rubric.json      the 100-point profile score
 templates/voice.md                 your voice profile. Fill this in first.
+tests/                             offline tests and engine-off goldens
+evals/                             label suites, recorded Jev answers, REPORT.md
 ```
 
 ## Credit
