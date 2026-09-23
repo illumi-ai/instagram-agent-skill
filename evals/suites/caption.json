@@ -1,0 +1,153 @@
+{
+  "suite": "caption",
+  "note": "smoke not benchmark: small sets, labelled by the agents that built them",
+  "gates": {
+    "report_only": true
+  },
+  "items": [
+    {
+      "id": "a1",
+      "caption": "She told me to share it with the whole team before Friday.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a2",
+      "caption": "I had to follow my gut and walk away from the deal.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a3",
+      "caption": "Which one did I pick? The cheaper one, obviously.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a4",
+      "caption": "I saved it to my notes and forgot about it for a year.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a5",
+      "caption": "My mentor used to say: tell me your rate and I'll tell you your clients.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a6",
+      "caption": "Raise your prices before you raise your output.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a7",
+      "caption": "Why did it work? Because the email named a date.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a8",
+      "caption": "Nobody could tell me why the invoice bounced.",
+      "gold": "no_ask",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a9",
+      "caption": "Tell me I'm not the only one who does this.",
+      "gold": "comment_reply",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a10",
+      "caption": "Drop your hourly rate below 👇",
+      "gold": "comment_reply",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a11",
+      "caption": "Let me know in the comments.",
+      "gold": "comment_reply",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a12",
+      "caption": "Would you raise your rates after reading this?",
+      "gold": "comment_reply",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a13",
+      "caption": "Comment below which one you'd pick.",
+      "gold": "comment_reply",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a14",
+      "caption": "Comment PRICING and I'll send you the calculator.",
+      "gold": "comment_keyword",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a15",
+      "caption": "Type RATES in the comments for the template.",
+      "gold": "comment_keyword",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a16",
+      "caption": "Tag the friend who needs to hear this.",
+      "gold": "share_or_send",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a17",
+      "caption": "Send this to someone who still charges by the hour.",
+      "gold": "share_or_send",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a18",
+      "caption": "Screenshot this before your next sales call.",
+      "gold": "save",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a19",
+      "caption": "Don't lose this one, hit save.",
+      "gold": "save",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a20",
+      "caption": "Hit follow so you don't miss part 2.",
+      "gold": "follow",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a21",
+      "caption": "Send me a message if you want the checklist.",
+      "gold": "dm",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a22",
+      "caption": "DM me AUDIT and I'll look at your profile.",
+      "gold": "dm",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a23",
+      "caption": "Grab the free template, it's linked on my profile.",
+      "gold": "link_in_bio",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "a24",
+      "caption": "Keep swiping for the full breakdown.",
+      "gold": "swipe",
+      "provenance": "probe-synthetic"
+    }
+  ]
+}

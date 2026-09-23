@@ -1,0 +1,173 @@
+{
+  "suite": "fit",
+  "note": "smoke not benchmark: small sets, labelled by the agents that built them",
+  "labels": "must_write: formulas whose needs the idea plainly states; must_veto: formulas whose needs it plainly lacks. Written for this suite (repo), not blind.",
+  "gates": {
+    "report_only": true
+  },
+  "items": [
+    {
+      "id": "i1",
+      "idea": "we cut proposal time from 5 hours to 20 minutes with one template",
+      "must_write": [
+        5
+      ],
+      "must_veto": [
+        1,
+        6,
+        23,
+        25
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i2",
+      "idea": "the 5-step onboarding checklist I send every new client, and the problem each step prevents",
+      "must_write": [],
+      "must_veto": [
+        1,
+        15,
+        23,
+        25
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i3",
+      "idea": "my contract template pack launches on Friday and I want my followers to know it is coming",
+      "must_write": [],
+      "must_veto": [
+        1,
+        6,
+        15,
+        23
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i4",
+      "idea": "why I stopped doing discovery calls, and also how I price monthly retainers",
+      "must_write": [],
+      "must_veto": [
+        23
+      ],
+      "multi": true,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i5",
+      "idea": "I want to find out what my followers find hardest about writing proposals",
+      "must_write": [],
+      "must_veto": [
+        1,
+        5,
+        6,
+        23
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i6",
+      "idea": "the four-line clause I now put in every contract, after a client asked for $18,000 back nine days after approving the work",
+      "must_write": [],
+      "must_veto": [
+        5,
+        17,
+        23
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i7",
+      "idea": "I stopped posting on weekends and my engagement didn't drop",
+      "must_write": [],
+      "must_veto": [
+        1,
+        4,
+        23
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i8",
+      "idea": "a client asked for their money back right after signing off on the work",
+      "must_write": [],
+      "must_veto": [
+        5,
+        23
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i9",
+      "idea": "10 tips for better reels",
+      "must_write": [],
+      "must_veto": [
+        1,
+        5,
+        6
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i10",
+      "idea": "being consistent is the key to growth on Instagram",
+      "must_write": [],
+      "must_veto": [
+        1,
+        5,
+        6,
+        23
+      ],
+      "multi": false,
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "i11",
+      "idea": "I lost $18,000 because one contract had no payment clause",
+      "must_write": [
+        1
+      ],
+      "must_veto": [
+        5,
+        17
+      ],
+      "multi": false,
+      "provenance": "repo"
+    },
+    {
+      "id": "i12",
+      "idea": "I posted one reel a day for 60 days and my DMs went from 3 a week to 40",
+      "must_write": [
+        6
+      ],
+      "must_veto": [
+        1,
+        23
+      ],
+      "multi": false,
+      "provenance": "repo"
+    },
+    {
+      "id": "i13",
+      "idea": "33% of the 200 freelancers I surveyed last month never ask for a deposit",
+      "must_write": [
+        23
+      ],
+      "must_veto": [
+        1,
+        5
+      ],
+      "multi": false,
+      "provenance": "repo"
+    }
+  ]
+}

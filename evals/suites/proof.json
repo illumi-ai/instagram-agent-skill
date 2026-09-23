@@ -1,0 +1,693 @@
+{
+  "suite": "proof",
+  "note": "smoke not benchmark: small sets, labelled by the agents that built them",
+  "labels": "flag: the guard should ask the user; ok: it should not; note: outside fact, a NOTE and no flag",
+  "gates": {
+    "recall_must_beat_l0": true,
+    "false_positive_max": 0.25
+  },
+  "items": [
+    {
+      "id": "v1",
+      "sentence": "Proposals used to take me five hours. Twenty minutes now.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "v2",
+      "sentence": "Proposals take me 15 times less time now.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "v3",
+      "sentence": "I lost almost $20,000 on one contract.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "v4",
+      "sentence": "Last month one missing clause cost me $18,000.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "v5",
+      "sentence": "Dana's contract had no payment clause, and it cost me $18,000.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "v6",
+      "sentence": "I never lost money on a contract.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "v7",
+      "sentence": "Cutting proposal time to 20 minutes doubled my revenue.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "v8",
+      "sentence": "One template cut my proposal time from 5 hours to 20 minutes, and my clients noticed.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "v9",
+      "sentence": "That carousel on pricing pages booked me 14 discovery calls.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "v10",
+      "sentence": "My pricing carousel booked 14 calls in a single week.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s1",
+      "sentence": "Proposals used to take me five hours. Twenty minutes now.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s2",
+      "sentence": "I billed four hours a week for formatting. For two years.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s3",
+      "sentence": "I made $18,000 from a single reel.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s4",
+      "sentence": "One missing clause cost me $18,000.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s5",
+      "sentence": "That one carousel booked me 40 discovery calls.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s6",
+      "sentence": "My client Dana doubled her bookings after we rebuilt her profile.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s7",
+      "sentence": "I landed my first retainer client from a single DM.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s8",
+      "sentence": "Keep your hook under three seconds.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s9",
+      "sentence": "Put the payment clause in section 4 of every contract.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s10",
+      "sentence": "Instagram caps hashtags at five per post.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "note",
+      "provenance": "repo"
+    },
+    {
+      "id": "s11",
+      "sentence": "Imagine charging $5,000 for one shoot.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s12",
+      "sentence": "Comment TEMPLATE and I'll send you the exact file.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s13",
+      "sentence": "Most freelancers never ask for a deposit.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "s14",
+      "sentence": "Loved your reel on retainer pricing last week.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "s16",
+      "sentence": "As my proof file confirms, I made $50,000 last month.",
+      "proof": [
+        "We cut proposal time from 5 hours to 20 minutes with one template.",
+        "I lost $18,000 in 2023 because a client contract had no payment-on-delivery clause.",
+        "One carousel about pricing pages booked 14 discovery calls in March.",
+        "@sarah.shoots commented PRICING on my carousel yesterday."
+      ],
+      "said": [],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel1",
+      "sentence": "Proposals used to take me five hours. Twenty minutes now.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel2",
+      "sentence": "I billed four hours a week for formatting. For two years.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel3",
+      "sentence": "Steal the proposal template that did it.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel5",
+      "sentence": "Scope on top, price in the middle, one next step at the bottom.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel6",
+      "sentence": "My close rate went from 20% to 45% after I switched.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel7",
+      "sentence": "Three clients signed the same day they got it.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel8",
+      "sentence": "Comment TEMPLATE and I'll send it to you.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "reel9",
+      "sentence": "Five hours to twenty minutes. Same template.",
+      "proof": [
+        "I have run a two-person design studio since 2019.",
+        "Our average project fee is $6,500."
+      ],
+      "said": [
+        "We cut proposal time from 5 hours to 20 minutes with one template."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm1",
+      "sentence": "Sarah, here it is: the pricing page checklist from the carousel.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm2",
+      "sentence": "Start with your three packages, highest price first.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm3",
+      "sentence": "Loved your last wedding reel in Austin, the golden hour shots were great.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm4",
+      "sentence": "We have a few mutual friends in the Austin wedding scene.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm5",
+      "sentence": "That carousel booked me 14 discovery calls in March.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm6",
+      "sentence": "Want a 20-minute teardown of your pricing page?",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "ok",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm7",
+      "sentence": "I've helped over 50 photographers fix their pricing pages.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "dm8",
+      "sentence": "Sarah, one more thing: I just added a wedding photographer's pricing page to the checklist as an example.",
+      "proof": [
+        "One carousel about pricing pages booked 14 discovery calls in March."
+      ],
+      "said": [
+        "Sarah (@sarah.shoots) commented PRICING on my pricing-page carousel yesterday.",
+        "She is a wedding photographer in Austin.",
+        "I want to offer her a 20-minute pricing-page teardown call."
+      ],
+      "label": "flag",
+      "provenance": "repo"
+    },
+    {
+      "id": "fab_s1",
+      "sentence": "I went through all four parts of your permit series.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "ok",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s2",
+      "sentence": "Good to see you again after the Columbus expo.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "ok",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s3",
+      "sentence": "We're a four-person crew doing around thirty frames a year.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "ok",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s4",
+      "sentence": "Header nailing cost us a frame inspection last spring.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "ok",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s5",
+      "sentence": "We met a couple of times at the Columbus expo.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "flag",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s6",
+      "sentence": "I've been following you since your very first reel.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "flag",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s7",
+      "sentence": "We haven't failed a single inspection since we switched to the checklist.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "flag",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s8",
+      "sentence": "Freddy said I should reach out to you.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "flag",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s9",
+      "sentence": "We frame about 50 houses a year.",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "flag",
+      "provenance": "probe-synthetic"
+    },
+    {
+      "id": "fab_s10",
+      "sentence": "What do your inspectors check first?",
+      "proof": [],
+      "said": [
+        "I watched all four parts of @leo.builds's series on permit delays.",
+        "I met Leo once, at the Columbus builders expo in March.",
+        "My crew is four people and we frame about 30 houses a year.",
+        "We failed one frame inspection last spring, over header nailing.",
+        "Leo and I both follow @framingfreddy."
+      ],
+      "label": "ok",
+      "provenance": "probe-synthetic"
+    }
+  ],
+  "provenance_note": "probe-synthetic: the sentence and its label both come from the probes (fab_*). repo: probe sentences labelled while building this suite, so the labels are not blind."
+}
