@@ -24,7 +24,7 @@ see it.
 Paste this into Claude:
 
 ```
-https://github.com/Jakeschincariol/instagram-agent-skill
+https://github.com/illumi-ai/instagram-agent-skill
 
 Install this skill, then confirm /ig-reel works.
 ```
@@ -32,14 +32,14 @@ Install this skill, then confirm /ig-reel works.
 Or do it yourself, in Claude Code:
 
 ```bash
-git clone https://github.com/Jakeschincariol/instagram-agent-skill.git
+git clone https://github.com/illumi-ai/instagram-agent-skill.git
 cp -r instagram-agent-skill/skills/ig-* ~/.claude/skills/
 ```
 
 Or as a plugin:
 
 ```
-/plugin marketplace add Jakeschincariol/instagram-agent-skill
+/plugin marketplace add illumi-ai/instagram-agent-skill
 /plugin install instagram-agent
 ```
 
@@ -422,7 +422,7 @@ evals/                             label suites, recorded Jev answers, REPORT.md
 
 ## Credit
 
-Made by Jake Schincariol, [opusjake.ai](https://opusjake.ai).
+Made by Jake Schincariol, [opusjake.ai](https://opusjake.ai). Maintained in this repository by [illumi-ai](https://github.com/illumi-ai), which added the Jev-backed decisions in v1.1 on top of [the original](https://github.com/Jakeschincariol/instagram-agent-skill).
 
 Sibling repo, same idea for a different platform:
 [linkedin-agent-skill](https://github.com/Jakeschincariol/linkedin-agent-skill).
