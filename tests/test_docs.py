@@ -79,5 +79,15 @@ class FormulaWired(unittest.TestCase):
         self.assertIn("../ig-reel/formula.py", read("ig-audit/SKILL.md"))
 
 
+
+class FitWired(unittest.TestCase):
+    def test_reel_runs_fit_first(self):
+        reel = read("ig-reel/SKILL.md")
+        self.assertIn('python3 fit.py "', reel)
+        self.assertIn("only from WRITABLE", reel)
+        self.assertRegex(reel, r"fit:\s+\d+ writable, \d+ unlockable, \d+ vetoed")
+        self.assertIn("fit: skipped", reel)
+
+
 if __name__ == "__main__":
     unittest.main()

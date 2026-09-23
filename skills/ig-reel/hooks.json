@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "note": "26 hook formulas for Reels. A Reel has two hooks that fire at the same time and they are not the same sentence: the first thing you say, and the first thing on screen. The spoken hook has about two seconds. The on-screen hook has about one, because it is read before it is heard. Every formula here carries a template, a filled example, the on-screen version, what it is for, and the way it usually gets ruined. Each formula also carries a `match` regex, so the same vocabulary can name a hook found in the wild and not only write a new one. Walk them in `classify_order`, which is most specific first, case-insensitive.",
+  "note": "26 hook formulas for Reels. A Reel has two hooks that fire at the same time and they are not the same sentence: the first thing you say, and the first thing on screen. The spoken hook has about two seconds. The on-screen hook has about one, because it is read before it is heard. Every formula here carries a template, a filled example, the on-screen version, what it is for, and the way it usually gets ruined. Each formula also carries a `match` regex, so the same vocabulary can name a hook found in the wild and not only write a new one. Walk them in `classify_order`, which is most specific first, case-insensitive. Each formula also lists `needs`: the facts its template cannot be written without, which fit.py checks an idea against before anything is written.",
   "rules": [
     "Write the spoken line and the on-screen line separately. On screen is the shorter, blunter one, six words or fewer, no punctuation it does not need.",
     "No setup. The video starts at the sentence you would normally reach at second six.",
@@ -18,6 +18,10 @@
       "on_screen": "$18,000 MISTAKE",
       "best_for": "Trust, fast. People finish the videos where you are the one who looks bad.",
       "trap": "A fake cost. 'It cost me my peace of mind' is not a number and everybody can hear that.",
+      "needs": [
+        "the amount one specific mistake cost",
+        "what the mistake was"
+      ],
       "match": "\\$\\s?\\d[\\d,]*\\s+(?:is|was) what\\b|\\bcost (?:me|us|him|her|them)\\b|\\blost\\b[^.!?]{0,20}\\$\\s?\\d"
     },
     {
@@ -28,6 +32,10 @@
       "on_screen": "STOP POSTING DAILY",
       "best_for": "Saves and arguments. The imperative gets attention that a statement does not.",
       "trap": "Telling people to stop doing something nobody does. The habit has to be one the viewer recognises in themselves.",
+      "needs": [
+        "a common habit the viewer should stop",
+        "the alternative to do instead"
+      ],
       "match": "^\\s*(?:stop|quit)\\s+(?!scrolling\\b)\\w+ing\\b|^\\s*(?:never|don'?t|dont|do not)\\s+(?:do|be|make|buy|use|start|say|post|send|take|charge|pay|sign|hire|give|offer|work|price|discount|reply|answer|write|run)\\b|\\bquit your\\b|[.!]\\s*(?:do|post|use|send|try)\\b[^.!?]*\\binstead\\b"
     },
     {
@@ -38,6 +46,9 @@
       "on_screen": "YOUR FIRST 30 WILL FLOP",
       "best_for": "New audiences. It positions you as the person who says the quiet part.",
       "trap": "Picking a truth everybody already says. If the comments are agreeing before you finish, it was not a secret.",
+      "needs": [
+        "an uncomfortable truth about something the viewer wants"
+      ],
       "match": "\\b(?:nobody|no one)\\s+(?:ever\\s+)?(?:tells?|told|talks?|talked|says?|said|mentions?|teach(?:es)?)\\s+(?:you|about|that|how|why|what|this)\\b|\\bwhat (?:nobody|no one) (?:tells|says)\\b"
     },
     {
@@ -48,6 +59,11 @@
       "on_screen": "$2,000 -> $12",
       "best_for": "Demos and tool videos. The price gap does the work.",
       "trap": "Overstating the replacement. If it replaced 60% of the job, say 60%, or the comments will say it for you.",
+      "needs": [
+        "the thing that did the replacing",
+        "the expensive thing it replaced",
+        "the price of each"
+      ],
       "match": "\\breplaced?\\b[^.!?]*\\$\\s?\\d|\\$\\s?\\d[^.!?]*\\breplaced?\\b|\\binstead of (?:paying|hiring)\\b"
     },
     {
@@ -58,6 +74,10 @@
       "on_screen": "5 HOURS -> 20 MIN",
       "best_for": "Process videos where the payoff is speed. Reads instantly on screen.",
       "trap": "A ratio nobody believes. 40 hours to 4 seconds gets treated as a lie even when it is true.",
+      "needs": [
+        "how long the task used to take",
+        "how long it takes now"
+      ],
       "match": "\\bused to take\\b|\\bnow (?:it )?(?:only )?takes?\\b|\\btakes? (?:me )?\\d+\\s*(?:sec|second|min|minute|hour|hr)"
     },
     {
@@ -68,6 +88,11 @@
       "on_screen": "60 DAYS. REAL NUMBERS.",
       "best_for": "Experiments. Pairs with a screen recording of the real dashboard, which is the whole value.",
       "trap": "Not showing the screen. A numbers video with no screen recording is a numbers claim.",
+      "needs": [
+        "something the creator did repeatedly",
+        "for how many days, weeks or months",
+        "the actual numbers that resulted"
+      ],
       "match": "\\bi\\s+\\w+(?:ed)?\\s+[^.!?]{0,30}\\bfor\\s+\\d+\\s+(?:days?|weeks?|months?|years?)\\b|\\bhere (?:are|is) (?:the|my)\\b[^.!?]*\\bnumbers\\b|\\bwe(?:'ll| will)? do \\$\\s?\\d"
     },
     {
@@ -78,6 +103,11 @@
       "on_screen": "YOUR CAPTIONS ARE CUT",
       "best_for": "Teaching. The 'not your fault' half stops it reading as an insult, which is what kills this one.",
       "trap": "Skipping the absolution. 'You are doing it wrong' on its own makes people leave rather than learn.",
+      "needs": [
+        "a thing the viewer does wrong",
+        "why it is not their fault",
+        "the fix"
+      ],
       "match": "\\b(?:big(?:gest)?|common|the) mistake\\b|\\bmistake (?:that|people|i)\\b|\\byou'?(?:re| are)\\s+\\w+ing\\b[^.!?]{0,40}\\bwrong\\b|\\bdoing (?:it|this) wrong\\b|\\bnot your fault\\b"
     },
     {
@@ -88,6 +118,11 @@
       "on_screen": "6 YEARS INSIDE",
       "best_for": "Authority without a credential slide. Works only if the years are real.",
       "trap": "Promising a secret and delivering the brochure. The comments are merciless about this one.",
+      "needs": [
+        "how many years the creator spent inside an industry or role",
+        "that industry or role",
+        "something insiders never say out loud"
+      ],
       "match": "\\bi (?:spent|worked|ran|was|have been)\\b[^.!?]*\\b(?:\\d+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty)\\s*\\+?\\s*years?\\b|\\bwe never (?:told|said|showed|put)\\b|\\bnobody (?:puts|tells you about)\\b|\\bi (?:sell|sold|run)\\b[^.!?]*\\$\\s?\\d"
     },
     {
@@ -98,6 +133,10 @@
       "on_screen": "STEAL THIS",
       "best_for": "Saves and sends, which are the two metrics that move reach the most.",
       "trap": "The artifact not being on screen. If they cannot screenshot it, there is nothing to steal.",
+      "needs": [
+        "a reusable artifact the viewer can copy",
+        "how long it took to get right"
+      ],
       "match": "^\\s*steal\\b|(?<!n't )(?<!not )(?<!dont )\\bsteal (?:this|these|my)\\b|^\\s*(?:here'?s|this is) (?:the|my) (?:exact|literal)\\b"
     },
     {
@@ -108,6 +147,10 @@
       "on_screen": "VIEWS BUT NO FOLLOWERS?",
       "best_for": "Qualifying hard. Fewer people stay, and the ones who do are the ones who buy.",
       "trap": "A situation so broad it qualifies nobody. 'If you want to grow' is not a situation.",
+      "needs": [
+        "a specific situation the viewer is in",
+        "the fix the video gives"
+      ],
       "match": "^\\s*if (?:you|i|we|your|my|they)\\b"
     },
     {
@@ -118,6 +161,11 @@
       "on_screen": "5 EDITS. #4 IS THE ONE.",
       "best_for": "Retention through the middle: naming a favourite gives people a reason to stay past three.",
       "trap": "N above seven. Nobody believes you have nine good ones, and you do not.",
+      "needs": [
+        "a list of a specific number of things",
+        "the outcome they produce",
+        "which one is the favourite"
+      ],
       "match": "^\\s*(?:here are\\s+)?(?:\\d+|three|four|five|six|seven|eight|nine|ten)\\s+\\w+(?:\\s+\\w+)?\\s+(?:that|to|you|i|every|for|which)\\b|\\bnumber (?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten)\\b|\\bthe last one is\\b"
     },
     {
@@ -128,6 +176,10 @@
       "on_screen": "\"I HATE BEING ON CAMERA\"",
       "best_for": "Selling to the people who already said no once.",
       "trap": "Inventing the objection. Pull it verbatim from a DM or a comment, including the bad grammar.",
+      "needs": [
+        "an objection the audience actually says, in their words",
+        "a version that works anyway"
+      ],
       "match": "^\\s*[\\\"“'][^\\\"”]{5,120}[\\\"”][,.]?\\s*(?:fine|ok|okay|sure|right|here)\\b|^\\s*i (?:don'?t|can'?t) \\w+[^.!?]{0,60}[.!?]\\s*(?:okay|ok|fine),?\\s*(?:then|here)\\b"
     },
     {
@@ -138,6 +190,11 @@
       "on_screen": "MARCH  /  NOW",
       "best_for": "Anything visual. The cut between the two frames is the hook, the words are secondary.",
       "trap": "Three levers. Name one thing that changed or the transformation stops being believable.",
+      "needs": [
+        "what it looked like before",
+        "what it looks like now",
+        "the one thing that changed"
+      ],
       "match": "\\b(?:this|that) was\\b[^.!?]*[.!?]\\s*(?:this|that) is\\b|\\bbefore\\b[^.!?]*\\bafter\\b|\\bi (?:look|looked) back at\\b"
     },
     {
@@ -148,6 +205,10 @@
       "on_screen": "PHOTOGRAPHERS UNDER $2K",
       "best_for": "Cutting a broad audience down to the one that converts. Send rate goes up because people tag each other.",
       "trap": "A group so large it is not a callout. 'Entrepreneurs' is not a group.",
+      "needs": [
+        "a specific group of viewers",
+        "the thing that group has been ignoring"
+      ],
       "match": "^\\s*(?:every|all|any)\\s+\\w+|^\\s*[a-z][\\w ]{2,28}(?:ers|ists|ors|ants|agents|owners|coaches)\\b[^.!?:,]{0,40}[,:]|^\\s*for (?:viewers|people|anyone|those|everyone)\\b|^\\s*(?:attention|listen up)\\b|^\\s*stop scrolling if you'?re\\b"
     },
     {
@@ -158,6 +219,11 @@
       "on_screen": "47 FLOPS, THEN THIS",
       "best_for": "People at the start, which is most of the audience. High comment rate.",
       "trap": "Making the change sound like luck. If the answer is 'I got lucky', there is no video.",
+      "needs": [
+        "how many attempts did nothing",
+        "what kind of attempts they were",
+        "what changed on the attempt that worked"
+      ],
       "match": "\\bmy first\\s+\\d+\\b|\\bfirst\\s+\\d+\\s+(?:reels?|videos?|posts?|clients?|months?)\\b"
     },
     {
@@ -168,6 +234,10 @@
       "on_screen": "ASKED EVERY WEEK",
       "best_for": "Search. A question typed the way people type it is what Instagram search is matching against.",
       "trap": "Tidying the question up. The value is that it is in their words, typos and all.",
+      "needs": [
+        "a question the audience asked, word for word",
+        "how often it gets asked"
+      ],
       "match": "^\\s*[\\\"“']?(?:how|what|what'?s|why|when|where|who|which|can|should|do|does|did|is|are|have you|would you)\\b[^?]{3,110}\\?"
     },
     {
@@ -178,6 +248,11 @@
       "on_screen": "CAROUSELS vs REELS",
       "best_for": "Comments. People arrive already holding an opinion, which is the point.",
       "trap": "Refusing to pick. A comparison with a diplomatic ending is a video with no ending.",
+      "needs": [
+        "two options the creator compared",
+        "how long they ran both",
+        "which one won"
+      ],
       "match": "\\b(?:vs\\.?|versus)\\b|\\bdifferences? between\\b|\\b(?:a|the) or (?:b|the)\\b"
     },
     {
@@ -188,6 +263,10 @@
       "on_screen": "WATCH THIS",
       "best_for": "Screen recordings and anything with a visible result. No setup at all, the hand is already moving.",
       "trap": "A result that takes twelve seconds to arrive. If the payoff is slow, cut to it and show the wait afterwards.",
+      "needs": [
+        "an action the creator is doing on screen",
+        "the visible result"
+      ],
       "match": "^\\s*watch (?:what|this|me)\\b|^\\s*(?:let me|lemme) show you\\b|^\\s*repeat after me\\b"
     },
     {
@@ -198,6 +277,11 @@
       "on_screen": "BEFORE YOU POST AGAIN",
       "best_for": "Urgency that is real. Platform changes, seasonal windows, policy updates.",
       "trap": "Manufactured urgency. One fake deadline and every future one is discounted.",
+      "needs": [
+        "a thing that is about to change",
+        "the date or moment it changes",
+        "the action to take before then"
+      ],
       "match": "\\bbefore (?:you|it|they|the|then)\\b|\\bchanges? (?:on|the second|when|the moment)\\b|\\bby 20\\d\\d\\b|\\bdeadline is\\b"
     },
     {
@@ -208,6 +292,10 @@
       "on_screen": "YOU DON'T NEED A NICHE",
       "best_for": "Relief. Very high save rate, because it removes a blocker rather than adding a task.",
       "trap": "Removing the blocker and putting nothing in its place. The second half is the whole video.",
+      "needs": [
+        "a thing everyone says you need",
+        "what the viewer needs instead"
+      ],
       "match": "\\byou (?:do not|don'?t|dont) need\\b|\\bstop (?:trying to|worrying about)\\b"
     },
     {
@@ -218,6 +306,9 @@
       "on_screen": "HE ASKED FOR A REFUND",
       "best_for": "Stories. Starting mid-scene makes the viewer feel they arrived late, which is a reason to stay.",
       "trap": "Never going back to fill in the gap. Deliver the setup by second eight or it reads as a mistake.",
+      "needs": [
+        "a story with a turning point"
+      ],
       "match": "^\\s*(?:\\.\\.\\.|…)|^\\s*(?:and (?:that'?s|that is|then) when|so (?:he|she|they) (?:said|asked))\\b|^\\s*(?:uh|um)\\b"
     },
     {
@@ -228,6 +319,9 @@
       "on_screen": "NICE GUYS FINISH FIRST",
       "best_for": "Comments. The viewer has to stop and check whether they misheard you.",
       "trap": "Flipping a saying nobody says. The original has to be a reflex, or the inversion is just a sentence.",
+      "needs": [
+        "a well-known saying the idea contradicts"
+      ],
       "match": "^\\s*[A-Za-z][\\w' ]{2,34}\\b(?:finish|finishes|win|wins|lose|loses|beats?|is|are)\\s+(?:first|last|dead|wrong|right|better|overrated|underrated)\\b"
     },
     {
@@ -238,6 +332,11 @@
       "on_screen": "33% NEVER READ AGAIN",
       "best_for": "Sends. A number a person can repeat at dinner gets sent to somebody.",
       "trap": "A statistic you cannot source. Say where it came from in the video or do not use it.",
+      "needs": [
+        "a percentage from a source that can be named",
+        "the group it describes",
+        "the surprising fact"
+      ],
       "match": "^\\s*\\d[\\d,.]*\\s?%|\\b\\d[\\d,.]*\\s?%\\s+of\\b"
     },
     {
@@ -248,6 +347,10 @@
       "on_screen": "THE NEW ONE",
       "best_for": "Anything physical or visual. The object is the hook and the words are captions on it.",
       "trap": "Holding the thing up without saying what it changes. A reveal with no stake is an advert.",
+      "needs": [
+        "a new physical or visual thing to show",
+        "what it changes"
+      ],
       "match": "^\\s*(?:so,?\\s+)?(?:this|these|here) (?:is|are)\\s+(?:the\\s+)?(?:new|my new)\\b|^\\s*(?:so,?\\s+)?this (?:new|tiny|little)\\b|^\\s*this \\w+ has (?:the|a)\\b"
     },
     {
@@ -258,6 +361,11 @@
       "on_screen": "1M SUBS IN ONE MONTH",
       "best_for": "Proof when the user does not have their own number yet. Third-person is allowed if it is true.",
       "trap": "No name and no link. An anonymous miracle is a rumour.",
+      "needs": [
+        "a specific person who can be named or linked",
+        "what they achieved",
+        "how long it took"
+      ],
       "match": "\\bthere (?:was|is) (?:one|a|this)\\b|\\b(?:one|a) (?:guy|girl|creator|student|founder|kid|client|friend) (?:i know |who |that )(?:\\w+ed|grew|made|built|went|took|got|hit)\\b|\\bwe had a new\\b"
     },
     {
@@ -268,6 +376,10 @@
       "on_screen": "THE FASTEST WAY",
       "best_for": "One-claim videos with no story attached. It is the most common shape in the wild and the easiest to write badly.",
       "trap": "A superlative with a soft answer. If the second half is 'consistency', you have said nothing and the comments will tell you.",
+      "needs": [
+        "a superlative claim about a way or a thing",
+        "the answer, stated specifically"
+      ],
       "match": "^\\s*(?:the\\s+)?(?:fastest|quickest|best|worst|biggest|greatest|easiest|hardest|only|number one|#1|most important)\\s+\\w+|\\bthe (?:fastest|best|worst|biggest|greatest|only) way to\\b"
     }
   ],

@@ -17,6 +17,7 @@ Two tools live in this folder and they both actually run. Use them. Do not
 eyeball the hook and do not guess at the length.
 
 ```bash
+python3 fit.py "the idea, in the user's words"   # which formulas the idea can carry
 python3 hookscore.py hooks.txt              # rank your hook options
 python3 hookscore.py --hook "one line"      # score a single one
 python3 beats.py script.txt --target 30     # timed beat sheet before you shoot
@@ -59,9 +60,29 @@ nothing else does.
 
 ## The loop
 
-**1. Pick three hooks, not one.** Run the idea through `hooks.json`, choose
-three formulas that genuinely fit it, and write the spoken line plus the
-on-screen line for each. Different formulas, not three rewrites of one.
+**0. Find the formulas this idea can carry.** Run `python3 fit.py "<the idea,
+in the user's words>"`. Every formula in `hooks.json` lists its `needs`, the
+facts its template cannot be written without, and TypeSafe's Jev model checks
+the idea against each one:
+
+- **WRITABLE**: choose the three formulas only from WRITABLE.
+- Fewer than three WRITABLE: write those, and add up to two of the UNLOCKABLE
+  "ask for" lines to the batched question.
+- None WRITABLE: the idea is thin. Ask the batched question from "Before you
+  write", then run `fit.py` again.
+- **TWO IDEAS?** means the idea is two videos. Ask which one first.
+- If the user names a VETOED formula, their call stands. Ask for the missing
+  ingredient instead of inventing it, and note the override in the log.
+- **`fit: skipped (...)`** means Jev was not available (no key, offline,
+  `IG_JEV=off`). Then use only formulas whose `needs` are stated in the idea;
+  otherwise ask for the missing ingredient.
+
+Jev never ranks the survivors, and its thresholds are provisional. Never
+compare results across engines.
+
+**1. Pick three hooks, not one.** From the WRITABLE formulas, choose three that
+genuinely fit the idea, and write the spoken line plus the on-screen line for
+each. Different formulas, not three rewrites of one.
 
 Put the three spoken lines in `hooks.txt`, one per line, and check them
 against the proof: `python3 ../ig-human/proofcheck.py hooks.txt --said said.txt`
@@ -91,6 +112,7 @@ separate list with timings, and then:
 
 ```
 REEL READY
+fit:        4 writable, 3 unlockable, 19 vetoed · engine jev-1.13.0
 hook:       #3 Nobody Tells You, scored 86 STRONG
 length:     28.4s across 9 beats at 165 wpm
 on-screen:  6 cards
@@ -103,7 +125,8 @@ Reply "yes" to log it, or tell me what to change.
 
 **7. Never publish.** This skill produces a script. The user shoots it and
 posts it. On "yes", append to `~/.claude/instagram/log.md` with the date, the
-hook formula used and the first line, so `/ig-audit` has a history later.
+hook formula used, the first line, the `fit:` line and any VETOED formula the
+user chose anyway, so `/ig-audit` has a history later.
 
 ## On-screen text is a separate script
 
@@ -143,20 +166,25 @@ Write it separately, every time. It is read before it is heard.
 ```
 
 ```
+FIT  (fit.py, engine jev-1.13.0)
+  writable:   #5 Time Collapse, #10 If This Then Watch, #2 Negative Command,
+              #13 Before And After
+  vetoed:     #1 Cost Confession, #6 The Receipt, #20 Permission and 16 more
+
 HOOKS  (scored)
-  79  STRONG  #20 Permission      "You do not need five hours for a proposal. You need one template."
-                                  on screen: NOT 5 HOURS. ONE TEMPLATE.
-  78  STRONG  #9  The Steal       "Steal this proposal template. It cut five hours to twenty minutes."
-                                  on screen: STEAL THIS
-  51  OK      #5  Time Collapse   "Proposals used to take me five hours. Twenty minutes now."
-                                  on screen: 5 HOURS -> 20 MIN
+  84  STRONG  #2  Negative Command      "Stop spending five hours on a proposal. Use one template instead."
+                                        on screen: STOP. ONE TEMPLATE.
+  69  OK      #10 If This, Then Watch   "If your proposals take five hours, the next 30 seconds cut that to twenty minutes."
+                                        on screen: 5-HOUR PROPOSALS?
+  51  OK      #5  Time Collapse         "Proposals used to take me five hours. Twenty minutes now."
+                                        on screen: 5 HOURS -> 20 MIN
 
-Shooting #20: it removes a blocker the viewer already feels, and both numbers
-are the user's own. #5 scores lower as text, since nothing in its words is at
-stake, but its on-screen line reads in one glance, so put 5 HOURS -> 20 MIN on
-screen under the #20 spoken line.
+Shooting #2: it names a habit the viewer recognises and hands them the
+replacement, and both numbers are the user's own. #5 scores lower as text,
+since nothing in its words is at stake, but its on-screen line reads in one
+glance, so put 5 HOURS -> 20 MIN on screen under the #2 spoken line.
 
-Not written: #1 Cost Confession needs what the five-hour version cost, and the
-idea does not say. Ask "what did the five-hour version cost you, in hours or
-money?" and do not write it until the user answers.
+Not written: #1 Cost Confession was vetoed, because the idea never says what
+the five-hour version cost. Ask "what did the five-hour version cost you, in
+hours or money?" and do not write it until the user answers.
 ```
