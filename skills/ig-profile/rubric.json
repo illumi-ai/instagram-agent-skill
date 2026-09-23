@@ -30,7 +30,7 @@
     {
       "id": "link",
       "points": 8,
-      "full_marks": "One destination that matches what the bio just promised. Up to five links are allowed; more than two is a menu, and a menu converts worse than a door.",
+      "full_marks": "One destination that matches what the bio just promised. Up to five links are allowed; two is already a menu, and a menu converts worse than a door.",
       "common_fail": "A link tree with eleven options, or no link at all."
     },
     {

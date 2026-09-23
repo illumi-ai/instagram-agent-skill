@@ -135,13 +135,19 @@ Write it separately, every time. It is read before it is heard.
 
 ```
 HOOKS  (scored)
-  86  STRONG  #5  Time Collapse   "Proposals used to take me five hours. Twenty minutes now."
-                                  on screen: 5 HOURS -> 20 MIN
-  71  STRONG  #1  Cost Confession "I billed four hours a week for formatting. For two years."
-                                  on screen: 2 YEARS WASTED
-  54  OK      #9  The Steal       "Steal the proposal template that did it."
+  79  STRONG  #20 Permission      "You do not need five hours for a proposal. You need one template."
+                                  on screen: NOT 5 HOURS. ONE TEMPLATE.
+  78  STRONG  #9  The Steal       "Steal this proposal template. It cut five hours to twenty minutes."
                                   on screen: STEAL THIS
+  51  OK      #5  Time Collapse   "Proposals used to take me five hours. Twenty minutes now."
+                                  on screen: 5 HOURS -> 20 MIN
 
-Shooting #5: the ratio is believable, it reads in one glance on screen,
-and the number is yours.
+Shooting #20: it removes a blocker the viewer already feels, and both numbers
+are the user's own. #5 scores lower as text, since nothing in its words is at
+stake, but its on-screen line reads in one glance, so put 5 HOURS -> 20 MIN on
+screen under the #20 spoken line.
+
+Not written: #1 Cost Confession needs what the five-hour version cost, and the
+idea does not say. Ask "what did the five-hour version cost you, in hours or
+money?" and do not write it until the user answers.
 ```

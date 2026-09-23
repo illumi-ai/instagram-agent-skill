@@ -50,6 +50,9 @@ Pick by what the post actually is. Never default to type 1.
 - **No emoji-only comments** and no emoji as the first character.
 - **Never restate the reel.** Everybody watching just watched it.
 - **One idea.** A comment with two points reads as a hijack.
+- **Never fabricate.** A receipt or a datum is only something from
+  `## Proof I can use` in `~/.claude/instagram/voice.md` or something the user
+  said in this session. If there is none, pick another type.
 - **Say the specific thing.** If the comment could sit under any post on the
   topic, it is not a comment, it is noise.
 - **No pitching, ever.** Not the offer, not the link, not "check out my page".
@@ -67,13 +70,14 @@ an em dash or a stock phrase is proportionally louder than it is in a caption.
 ```
 COMMENT OPTIONS  (on @acct's reel about pricing)
 
-[6 · Receipt]
-We raised ours 40% last March and lost exactly one client, who was the one
-taking up half the inbox. Took eight months to stop being scared of it.
+[6 · Receipt]  (from Proof I can use: "Raised prices 40% in March 2024. Lost
+one client, the one taking up half the inbox.")
+We raised ours 40% in March 2024 and lost exactly one client, who was the
+one taking up half the inbox.
 
 [3 · Respectful disagree]
-Agree on the anchoring. The part I would push back on is doing it mid-project.
-We tried that and it cost us a renewal that was otherwise fine.
+Agree on the anchoring. The part I would push back on is doing it mid-project:
+the client already said yes to a number, and moving it then reads as a switch.
 
 Post the first. It concedes something and it has a number in it.
 ```

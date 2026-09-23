@@ -44,7 +44,10 @@ Ask in one batched question:
 3. **What the user wants** - a conversation, a sale, a collab, a referral. Be
    honest internally, even if the message does not lead with it.
 
-If there is no trigger, there is no message. Say so.
+If there is no trigger, there is no message. Say so. A trigger is something
+the recipient did, recently, that the user can point to: a keyword they
+commented, a story they replied to, a post they published this week. Their
+follower count, their niche or "they fit the ICP" is not a trigger.
 
 ## The keyword delivery
 
@@ -77,8 +80,9 @@ restricted account.
 - **Give before asking.** A number, a template, a name, an answer.
 - **One ask, small.** "Worth a quick call?" beats "let me walk you through the
   platform".
-- **No link and no calendar in message one.** It reads as a funnel because it
-  is one.
+- **No link and no calendar in message one** of a warm approach. It reads as a
+  funnel because it is one. The keyword delivery is the exception: there the
+  link is the thing they asked for, so it goes first.
 - **No voice note to a stranger.** It is a great tool and it is for people who
   already know the user's voice.
 
@@ -109,7 +113,9 @@ Then stop. A third converts nobody and costs the relationship.
   restricts the account.
 - Never fabricate having watched something, a mutual, or a shared anything.
 - Never open with "Hey! Quick question" and then not ask a question.
-- Never send the pitch in the same message as the compliment.
+- Never put the pitch in a message whose only other content is a generic
+  compliment. A specific observation of their work, as in the collab pitch, is
+  not a compliment, it is the reason for the message.
 
 ## Output
 
