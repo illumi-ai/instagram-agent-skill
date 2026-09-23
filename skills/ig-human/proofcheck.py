@@ -77,8 +77,8 @@ class Item:
 
 BULLET_RE = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+(.*\S)?\s*$")
 FIELD_RE = re.compile(r"^\s*[-*]\s+\*\*(Name|Handle):\*\*\s*(.*?)\s*$", re.IGNORECASE)
-HANDLE_RE = re.compile(r"@[A-Za-z0-9_](?:[A-Za-z0-9_.]*[A-Za-z0-9_])?")
-CAP_RE = re.compile(r"\b[A-Z][a-z]{2,}\b")
+HANDLE_RE = re.compile(r"(?<![\w.])@[A-Za-z0-9_](?:[A-Za-z0-9_.]*[A-Za-z0-9_])?")
+CAP_RE = re.compile(r"\b[A-Z][a-z]+\b")
 
 
 def _sections(text):
@@ -194,12 +194,25 @@ NOT_A_CLAIM_RE = re.compile(r"(?i)\b(i'll|i’ll|i will|we'll|we’ll|we will|i 
                             r"i’d like|i'm going to|i’m going to|let me)\b")
 
 
+CLAUSE_RE = re.compile(r"[.!?]+[\"'”’)]*\s+|[,;:]\s+|\s+(?:and|but|so|then|because)\s+",
+                       re.IGNORECASE)
+
+
 def is_l0_claim(sentence):
-    """First person or a client, and not a question or a promise about the future."""
-    s = sentence.strip()
-    if s.endswith("?") or NOT_A_CLAIM_RE.search(s):
-        return False
-    return bool(CLAIM_RE.search(s))
+    """True when any clause is first person or about a client and is not a
+    promise about the future, or a question with no number in it.
+
+    Clause by clause, so a short follow-up cannot hide the claim before it:
+    "I made $50k from one reel. Crazy, right?" and "I made $50k and I'll show
+    you how" are both claims.
+    """
+    for clause in (c.strip() for c in CLAUSE_RE.split(sentence)):
+        if not clause or not CLAIM_RE.search(clause) or NOT_A_CLAIM_RE.search(clause):
+            continue
+        if clause.endswith("?") and not numbers(clause):
+            continue
+        return True
+    return False
 
 
 # --------------------------------------------------------------------------
@@ -243,10 +256,15 @@ YEAR_BEFORE_RE = re.compile(
     r"december)\s+$")
 WORD_NUM = r"(?:" + "|".join(sorted(list(SMALL) + list(SCALES), key=len, reverse=True)) + r")"
 NUM_RE = re.compile(
-    r"(?P<money>\$)?\s?(?P<digits>\d(?:[\d,]*\d)?(?:\.\d+)?)(?P<k>(?-i:[kK]\b|M\b))?"
+    r"(?P<money>\$)?\s?(?P<digits>\d(?:[\d,]*\d)?(?:\.\d+)?)(?P<k>(?-i:[kK]\b|[mM]\b|bn\b))?"
     r"|\b(?P<words>" + WORD_NUM + r"(?:[\s-]+(?:and\s+)?" + WORD_NUM + r"|[\s-]+one\b)*)\b"
     r"|\b(?P<mult>" + "|".join(MULTIPLIERS) + r")\b",
     re.IGNORECASE)
+
+
+# Numbers inside set phrases are not quantities anybody claimed.
+IDIOM_RE = re.compile(r"(?i)\b(?:9-to-5|nine-to-five|24/7|1:1|1-on-1|one-on-one|one-to-one|"
+                      r"\d{1,2}:\d{2}(?:\s?[ap]m)?)\b")
 
 
 def _words_value(text):
@@ -273,16 +291,24 @@ def numbers(text):
     more often than they are a count.
     """
     out = []
+    idioms = [(i.start(), i.end()) for i in IDIOM_RE.finditer(text)]
     for m in NUM_RE.finditer(text):
         start, end = m.start(), m.end()
+        if any(a <= m.start() < b or a < end <= b for a, b in idioms):
+            continue
         if m.group("mult"):
+            if re.match(r"-[A-Za-z]", text[end:end + 2]):      # double-check, half-baked
+                continue
             out.append(Num(float(MULTIPLIERS[m.group("mult").lower()]), "x", m.group(0), start, end))
             continue
         if m.group("digits"):
             start = m.start("money") if m.group("money") else m.start("digits")
             value = float(m.group("digits").replace(",", ""))
-            if m.group("k"):
-                value *= 1000 if m.group("k") in "kK" else 1_000_000
+            suffix = m.group("k")
+            if suffix == "m" and not m.group("money"):         # "10m" is as likely minutes
+                suffix, end = None, m.end("digits")
+            if suffix:
+                value *= {"k": 1e3, "K": 1e3, "m": 1e6, "M": 1e6, "bn": 1e9}[suffix]
             unit = "$" if m.group("money") else ""
         else:
             start = m.start("words")
@@ -320,7 +346,12 @@ def bind_number(n, item_nums):
     """'direct' when an item number matches, 'derived' when two numbers of the
     same item produce it, None otherwise."""
     for t in item_nums:
-        if _compatible(n.unit, t.unit) and _close(n.value, t.value):
+        if not _compatible(n.unit, t.unit):
+            continue
+        if "year" in (n.unit, t.unit):
+            if n.value == t.value:
+                return "direct"
+        elif _close(n.value, t.value):
             return "direct"
     for i, a in enumerate(item_nums):
         for j, b in enumerate(item_nums):
@@ -359,14 +390,29 @@ NOT_NAMES = {
     "january", "february", "march", "april", "june", "july", "august", "september",
     "october", "november", "december", "today", "tomorrow", "yesterday", "here", "there",
     "this", "that", "the", "and", "but", "then", "also", "plus", "christmas", "easter",
+    "may", "hi", "ok", "oh", "so", "no", "my", "we", "me", "us", "it", "is", "in", "on", "at",
+    "to", "of", "or", "an", "as", "if", "by", "up", "do", "go", "be", "he", "am", "dr", "mr",
+    "ms", "mrs", "st", "jr", "sr", "vs", "pm",
 }
+ABBREV = ("Dr", "Mr", "Ms", "Mrs", "St", "Jr", "Sr", "vs", "etc")
 
 
 def _sentence_starts(text):
-    starts = {0}
-    for m in re.finditer(r"(?:[.!?:]+[\"'”’)]*\s+|\n\s*)", text):
-        starts.add(m.end())
-    return starts | {s + 1 for s in starts if s < len(text) and text[s] in "\"'“‘("}
+    """Where sentences begin: the start, after . ! ? (not after Dr. or Mr.) and
+    after a line break, skipping any bullet, arrow, emoji or quote before the
+    first letter."""
+    raw = [0]
+    for m in re.finditer(r"(?:[.!?]+[\"'”’)]*\s+|\n\s*)", text):
+        before = text[:m.start()]
+        if text[m.start()] == "." and before.split()[-1:] and before.split()[-1] in ABBREV:
+            continue
+        raw.append(m.end())
+    starts = set()
+    for s in raw:
+        while s < len(text) and not text[s].isalnum():
+            s += 1
+        starts.add(s)
+    return starts
 
 
 def names(text):
@@ -545,6 +591,24 @@ def _load_jev():
         return None
 
 
+# Words that describe a derived number rather than add a fact ("15 times less").
+DERIVATION_WORDS = {"times", "less", "more", "faster", "slower", "fewer", "higher", "lower",
+                    "cut", "cuts", "doubled", "double", "tripled", "triple", "half", "halved",
+                    "percent", "down", "went", "instead", "than"}
+
+
+def _stem(word):
+    word = re.sub(r"['’]s$", "", word)
+    return word[:-1] if len(word) > 3 and word.endswith("s") and not word.endswith("ss") else word
+
+
+def _adds_words(sentence, proof):
+    """Content words the sentence has and the proof does not, beyond the
+    vocabulary of a derived number. Non-empty means the sentence adds a fact."""
+    proof_words = {_stem(w) for w in content_words(proof)}
+    return {_stem(w) for w in content_words(sentence) if w not in DERIVATION_WORDS} - proof_words
+
+
 def _jev_verdict(s, items, answers):
     """Status for one claim, from Jev's same/held answers and L0's number bindings."""
     if not items:
@@ -564,7 +628,7 @@ def _jev_verdict(s, items, answers):
     if any(k not in backed for k in range(len(s["nums"]))):
         return "MISMATCH", best.id, [f"your proof says: {best.text}"], same_p, held_p
     if held_p < HELD:
-        if bound["derived"]:
+        if bound["derived"] and not _adds_words(s["text"], best.text):
             return "DERIVED", best.id, [f"{best.id} says: {best.text}"], same_p, held_p
         return "EMBELLISHED", best.id, [f"{best.id} says: {best.text}"], same_p, held_p
     return "BACKED", best.id, [], same_p, held_p

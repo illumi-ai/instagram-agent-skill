@@ -360,5 +360,76 @@ class CLI(unittest.TestCase):
             self.assertEqual(p.returncode, 2)
 
 
+
+class ReviewRegressions(unittest.TestCase):
+    """Cases found in code review: each one used to pass the guard or corrupt the draft."""
+
+    def setUp(self):
+        self.items, self.allowed = pc.load_evidence(
+            "## Proof I can use\n\n- Made $5k from one reel in 2024\n"
+            "- Started coaching founders in 2019\n", "", "")
+
+    def status(self, draft):
+        return pc.check(draft, self.items, self.allowed, engine="off")
+
+    def test_short_follow_up_does_not_hide_the_claim(self):
+        for draft in ["I made $50k from one reel. Crazy, right?",
+                      "I made $50k from one reel. I'll explain.",
+                      "My client Sarah made $50k from one reel. How?",
+                      "I made $50k from one reel and I'll show you how."]:
+            r = self.status(draft)
+            self.assertEqual(r["exit"], 1, draft)
+            self.assertTrue(r["sentences"][0]["claim"], draft)
+
+    def test_questions_and_promises_without_numbers_are_not_claims(self):
+        self.assertFalse(pc.is_l0_claim("Did I mention how much I love this?"))
+        self.assertFalse(pc.is_l0_claim("I'll send it to you tomorrow."))
+        self.assertTrue(pc.is_l0_claim("Want to know how I made $50k?"))
+
+    def test_years_match_exactly(self):
+        for draft in ["I have been coaching founders since 2005.",
+                      "In 2010 I quit my job to coach founders."]:
+            self.assertEqual(self.status(draft)["exit"], 1, draft)
+        self.assertEqual(self.status("I have been coaching founders since 2019.")["exit"], 0)
+
+    def test_bullets_arrows_and_emoji_are_not_names(self):
+        for line in ["\u2192 Booked 12 calls for my clients this week",
+                     "- Grew my list to 4,000 subscribers",
+                     "\U0001F525 Tripled my revenue in 3 months",
+                     "In May I signed 3 new clients"]:
+            sent = pc.split_sentences(line)[0]
+            self.assertEqual(pc.names(sent["text"]), [], line)
+
+    def test_names_that_used_to_slip_through(self):
+        self.assertEqual([n[0] for n in pc.names("My client Jo doubled her rates.")], ["Jo"])
+        self.assertEqual([n[0] for n in pc.names("Coca-Cola: Nike paid me for one reel.")],
+                         ["Cola", "Nike"])
+        self.assertEqual([n[0] for n in pc.names("I worked with Dr. Smith on it.")], ["Smith"])
+
+    def test_set_phrases_and_emails_are_not_flagged(self):
+        self.assertEqual(pc.numbers("I quit my 9-to-5 and run 1:1 calls 24/7 at 10:30am."), [])
+        self.assertEqual(pc.numbers("Always double-check the invoice."), [])
+        self.assertEqual(pc.handles("Email me at hi@studio.com"), [])
+        self.assertEqual([(n.value, n.unit) for n in pc.numbers("I raised $5m.")],
+                         [(5_000_000, "$")])
+
+
+class DerivedOnlyWhenNothingElseIsAdded(JevCase):
+    def test_extra_facts_make_it_embellished(self):
+        items, allowed = pc.load_evidence(
+            "## Proof I can use\n\n- Went from 10 clients to 20 clients in 2023\n", "", "")
+
+        def ans(q, spec):
+            if q.startswith("kind_"):
+                return choice("own_record")
+            return {"type": "noul", "noul": 0.95 if q.startswith("same_") else 0.05}
+        jev.set_transport(fake(ans))
+        r = pc.check("I doubled my client list after one viral reel got me featured on a podcast.",
+                     items, allowed)
+        self.assertEqual(r["sentences"][0]["status"], "EMBELLISHED")
+        r = pc.check("I doubled my clients.", items, allowed)
+        self.assertEqual(r["sentences"][0]["status"], "DERIVED")
+
+
 if __name__ == "__main__":
     unittest.main()
