@@ -42,3 +42,13 @@ def run_cli(script_rel, args, stdin=None, env_extra=None):
     return subprocess.run([sys.executable, os.path.join(SKILLS, script_rel)] + list(args),
                           input=stdin, capture_output=True, text=True,
                           env=clean_env(env_extra), cwd=ROOT)
+
+
+def write(path, text):
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def read(path):
+    with open(path, encoding="utf-8") as fh:
+        return fh.read()

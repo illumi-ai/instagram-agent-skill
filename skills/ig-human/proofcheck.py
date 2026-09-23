@@ -461,3 +461,282 @@ def apply_placeholders(draft, report):
         out = out[:f["start"]] + f["placeholder"] + out[f["end"]:]
         last_start = f["start"]
     return out
+
+
+# --------------------------------------------------------------------------
+# L1: the questions Jev answers. The wording is frozen: changing it means
+# re-running `python3 evals/run.py --suite proof --live --record`.
+
+KIND_QUESTION = ("What kind of statement is `sentence`, as the creator would say it in their own "
+                 "Instagram post or message?")
+KINDS = {
+    "own_record": (
+        "States something the speaker did, saw, experienced, earned, lost or achieved, or "
+        "something that happened to the speaker or their business: a result, an amount, a "
+        "time, an event. This includes saying the speaker watched, read, liked or noticed a "
+        "specific post, met or talked to someone, or shares friends, clients or events with "
+        "the person they are writing to."),
+    "client_result": (
+        "States something that happened to, or was achieved by, a specific client, customer, "
+        "student or collaborator of the speaker."),
+    "outside_fact": (
+        "States a fact or statistic about other people, a platform, a company or the world "
+        "that could be checked against a source."),
+    "advice_or_opinion": (
+        "Tells the viewer what to do, or gives the speaker's belief or opinion, without "
+        "stating a specific event or result."),
+    "hypothetical": ("Describes an imagined, example or conditional situation, not something "
+                     "that happened."),
+    "ask_or_other": "A question, a call to action, a greeting, or a line that states nothing.",
+}
+SAME_QUESTION = "Does `proof_item` report the same event or result that `sentence` states?"
+SAME_CRITERIA = {
+    "true": ("The proof item describes the same event or result as the sentence, even if the "
+             "sentence words it differently or leaves details out."),
+    "false": ("The proof item describes a different event, client or result, or does not "
+              "mention what the sentence states, even if the topic is similar."),
+}
+HELD_QUESTION = "Is everything that `sentence` states also stated in `proof_item`?"
+HELD_CRITERIA = {
+    "true": ("Every event, person, place, time and result that the sentence states is also "
+             "stated in the proof item. Different wording, and a number written in words "
+             "instead of digits, still count as stated."),
+    "false": ("The sentence states at least one event, person, place, time or result that the "
+              "proof item does not state, or states the opposite of the proof item."),
+}
+
+NEEDS_CONFIRMING = {"UNBACKED", "MISMATCH", "EMBELLISHED", "UNVERIFIED", "FLAGGED"}
+
+
+def build_questions(sentences, items):
+    """kind for every sentence; same and held for every sentence against its shortlist.
+
+    The pairs are asked for every sentence, not only the claims L0 found,
+    because Jev may widen the claim set and everything goes out in one
+    request. Code reads only the pairs of the sentences that end up claims.
+    """
+    index = {it.id: j for j, it in enumerate(items)}
+    q = {}
+    for s in sentences:
+        i = s["i"]
+        q[f"kind_{i}"] = {"type": "choice",
+                          "instructions": {"sentence": s["text"], "question": KIND_QUESTION},
+                          "criteria": KINDS}
+        for iid in (s["shortlist"] if items else []):
+            j = index[iid]
+            pair = {"sentence": s["text"], "proof_item": items[j].text}
+            q[f"same_{i}_{j}"] = {"type": "noul",
+                                  "instructions": dict(pair, question=SAME_QUESTION),
+                                  "criteria": SAME_CRITERIA}
+            q[f"held_{i}_{j}"] = {"type": "noul",
+                                  "instructions": dict(pair, question=HELD_QUESTION),
+                                  "criteria": HELD_CRITERIA}
+    return q
+
+
+def _load_jev():
+    """The Jev client lives in this folder. None if it cannot be imported."""
+    if HERE not in sys.path:
+        sys.path.insert(0, HERE)
+    try:
+        import jev
+        return jev
+    except Exception:
+        return None
+
+
+def _jev_verdict(s, items, answers):
+    """Status for one claim, from Jev's same/held answers and L0's number bindings."""
+    if not items:
+        return "UNBACKED", None, [], None, None
+    index = {it.id: j for j, it in enumerate(items)}
+    pairs = [(answers[f"same_{s['i']}_{index[iid]}"]["noul"], index[iid])
+             for iid in s["shortlist"] if f"same_{s['i']}_{index[iid]}" in answers]
+    if not pairs:
+        return "UNBACKED", None, [], None, None
+    same_p, j = max(pairs, key=lambda p: (p[0], -p[1]))
+    held_p = answers[f"held_{s['i']}_{j}"]["noul"]
+    best = items[j]
+    if same_p < SAME:
+        return "UNBACKED", None, [], same_p, held_p
+    bound = s["bindings"].get(best.id, {"direct": [], "derived": []})
+    backed = set(bound["direct"]) | set(bound["derived"])
+    if any(k not in backed for k in range(len(s["nums"]))):
+        return "MISMATCH", best.id, [f"your proof says: {best.text}"], same_p, held_p
+    if held_p < HELD:
+        if bound["derived"]:
+            return "DERIVED", best.id, [f"{best.id} says: {best.text}"], same_p, held_p
+        return "EMBELLISHED", best.id, [f"{best.id} says: {best.text}"], same_p, held_p
+    return "BACKED", best.id, [], same_p, held_p
+
+
+def check(draft, items, allowed, engine=None):
+    """The whole guard: L0 always, L1 when Jev answers. One engine per report."""
+    rep = l0(draft, items, allowed)
+    jev = _load_jev()
+    result, error = None, None
+    if jev is None:
+        error = "client-missing"
+    elif not rep:
+        error = jev.JevUnavailable("disabled", "nothing to check")
+    else:
+        try:
+            state = {"draft": "\n".join(s["text"] for s in rep)}
+            result = jev.ask_many(state, build_questions(rep, items), engine=engine)
+        except jev.JevUnavailable as e:
+            error = e
+
+    sentences = []
+    for s in rep:
+        kind, p_claim, notes = None, None, []
+        status, proof, same_p, held_p = None, None, None, None
+        claim = s["claim"]
+        if result is not None:
+            k = result.answers[f"kind_{s['i']}"]
+            kind = k["choice"]
+            p_claim = k["probabilities"].get("own_record", 0) + k["probabilities"].get("client_result", 0)
+            if not claim and p_claim >= CLAIM:
+                # Jev widened the claim set: run the code checks on it too.
+                claim = True
+                s["nums"], s["bindings"], s["flags"] = claim_flags(s["text"], s["start"], items, allowed)
+            if claim:
+                status, proof, notes, same_p, held_p = _jev_verdict(s, items, result.answers)
+            if kind == "outside_fact" and s["nums"]:
+                notes.append("statistic: add a source or cut")
+        elif claim:
+            status = ("UNVERIFIED" if s["unverified"] else "FLAGGED" if s["flags"] else "CHECKED")
+            if status == "CHECKED":
+                ids = [k for k in s["bindings"] if k != "unbound"]
+                proof = ids[0] if ids else None
+        sentences.append({
+            "i": s["i"], "text": s["text"], "claim": claim, "kind": kind,
+            "p_claim": None if p_claim is None else round(p_claim, 3),
+            "status": status, "proof": proof,
+            "proof_text": next((it.text for it in items if it.id == proof), None),
+            "numbers": [n.text for n in s["nums"]],
+            "flags": s["flags"], "notes": notes,
+            "same": None if same_p is None else round(same_p, 3),
+            "held": None if held_p is None else round(held_p, 3),
+        })
+
+    statuses = [x["status"] for x in sentences]
+    summary = {
+        "backed": sum(st in ("BACKED", "CHECKED") for st in statuses),
+        "derived": statuses.count("DERIVED"),
+        "to_confirm": sum(st in NEEDS_CONFIRMING for st in statuses),
+        "placeholders": sum(len(x["flags"]) for x in sentences),
+    }
+    fields = (jev.engine_fields(result, error) if jev else
+              {"engine": "heuristic", "engine_reason": "client-missing", "engine_detail": None,
+               "model": None, "usage": None, "requests": 0})
+    if jev and result is not None:
+        line = jev.engine_line(result)
+    elif jev:
+        line = jev.engine_line(reason=fields["engine_reason"], detail=fields["engine_detail"] or "")
+    else:
+        line = "engine: heuristic (client-missing)"
+    return dict(fields, engine_line=line,
+                evidence=[{"id": it.id, "text": it.text, "kind": it.kind} for it in items],
+                sentences=sentences,
+                judgments=result.answers if result is not None else {},
+                summary=summary,
+                exit=1 if (summary["to_confirm"] or summary["placeholders"]) else 0)
+
+
+EXPLAIN = {
+    "BACKED": "backed by {proof}",
+    "CHECKED": "numbers and names found in your evidence; meaning not judged (heuristic)",
+    "DERIVED": "a number worked out from {proof}. Check it reads right",
+    "UNBACKED": "no evidence reports this. Confirm it or cut it",
+    "MISMATCH": "the matching proof says something else. Use its number or cut",
+    "EMBELLISHED": "says more than {proof}. Confirm the extra or cut it",
+    "UNVERIFIED": "nothing in your evidence mentions this. Confirm it or cut it",
+    "FLAGGED": "a number or name is not in your evidence. Confirm it or cut it",
+}
+
+
+def render(r, out=None):
+    lines = [r["engine_line"], ""]
+    claims = sum(1 for s in r["sentences"] if s["claim"])
+    head = (f"PROOF CHECK  ·  {len(r['sentences'])} sentences  ·  {claims} claims  ·  "
+            f"{len(r['evidence'])} evidence items")
+    lines += [head, "=" * max(len(head), 62), "  evidence used"]
+    if r["evidence"]:
+        lines += [f"    {e['id']:<9} {e['text']}" for e in r["evidence"]]
+    else:
+        lines.append("    none. Every claim needs confirming: fill in ## Proof I can use in "
+                     "voice.md, or say the facts in this session.")
+    lines.append("-" * max(len(head), 62))
+    for s in r["sentences"]:
+        if not s["claim"] and not s["notes"] and not s["flags"]:
+            continue
+        status = s["status"] or "NOTE"
+        lines.append(f"  {status:<12}{s['i']:>2}  \"{s['text']}\"")
+        if s["status"]:
+            lines.append(f"  {'':<16}{EXPLAIN[s['status']].format(proof=s['proof'])}")
+        for n in s["notes"]:
+            lines.append(f"  {'':<16}{n}")
+        for f in s["flags"]:
+            what = {"number": "number", "name": "name", "handle": "handle"}[f["type"]]
+            lines.append(f"  {'':<16}{what} not in your evidence: {f['text']} -> {f['placeholder']}")
+    lines.append("-" * max(len(head), 62))
+    sm = r["summary"]
+    engine = r["model"] if r["engine"] == "jev" else "heuristic"
+    lines.append(f"  proof: {sm['backed']} backed, {sm['placeholders']} {{{{…}}}}, "
+                 f"{sm['to_confirm']} to confirm · engine {engine}")
+    if sm["derived"]:
+        lines.append(f"  {sm['derived']} derived: light review")
+    text = "\n".join(lines) + "\n"
+    if out is not None:
+        out.write(text)
+    return text
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Check a draft's claims against your own evidence.")
+    ap.add_argument("draft", help="draft file, or - for stdin")
+    ap.add_argument("--said", help="file with the user's own messages from this session, verbatim")
+    ap.add_argument("--source", help="the user's own source material (a transcript, a post)")
+    ap.add_argument("--voice", default=VOICE, help=f"voice.md (default {VOICE})")
+    ap.add_argument("-o", "--out", help="write the draft with {{placeholders}} applied here")
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--engine", choices=["auto", "jev", "off"],
+                    help="auto (default): Jev when TYPESAFE_API_KEY is set; off: code only")
+    args = ap.parse_args()
+
+    def read(path):
+        if not path:
+            return ""
+        if path == "-":
+            return sys.stdin.read()
+        with open(path, encoding="utf-8") as fh:
+            return fh.read()
+
+    draft = read(args.draft)
+    if not split_sentences(draft):
+        print("nothing to check", file=sys.stderr)
+        sys.exit(2)
+    voice = ""
+    if os.path.exists(os.path.expanduser(args.voice)):
+        voice = read(os.path.expanduser(args.voice))
+    else:
+        print(f"note: no voice.md at {args.voice}, so no Proof evidence.", file=sys.stderr)
+    items, allowed = load_evidence(voice, read(args.said), read(args.source))
+    r = check(draft, items, allowed, engine=args.engine)
+
+    if args.json:
+        print(json.dumps({k: v for k, v in r.items() if k != "engine_line"}, indent=2,
+                         ensure_ascii=False))
+    else:
+        render(r, out=sys.stdout)
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            fh.write(apply_placeholders(draft, [{"flags": s["flags"]} for s in r["sentences"]]))
+        print(f"wrote {args.out}", file=sys.stderr)
+    if args.engine == "jev" and r["engine"] != "jev":
+        sys.exit(3)
+    sys.exit(r["exit"])
+
+
+if __name__ == "__main__":
+    main()

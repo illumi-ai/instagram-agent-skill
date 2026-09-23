@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from tests.support import load, run_cli
+from tests.support import load, read, run_cli, write
 
 pc = load("proofcheck")
 jev = load("jev")
@@ -150,6 +150,214 @@ class L0Report(unittest.TestCase):
         short = pc.shortlist("That carousel booked me 14 calls.", self.items)
         self.assertEqual(short[0].id, "proof3")
         self.assertLessEqual(len(short), pc.SHORTLIST)
+
+
+
+# --------------------------------------------------------------------------
+# L1: Jev through a fake transport
+
+
+def fake(answer_fn):
+    """Transport that answers every question with answer_fn(qid, question)."""
+    def transport(body, timeout):
+        return {"model": jev.MODEL, "usage": {"input_tokens": 10, "output_tokens": 1},
+                "answers": {q: answer_fn(q, spec) for q, spec in body["questions"].items()}}
+    return transport
+
+
+KINDS = ["own_record", "client_result", "outside_fact", "advice_or_opinion", "hypothetical",
+         "ask_or_other"]
+
+
+def choice(pick, opts=KINDS):
+    rest = 0.1 / (len(opts) - 1)
+    return {"type": "choice", "choice": pick, "confidence": 0.9,
+            "probabilities": {o: (0.9 if o == pick else rest) for o in opts}}
+
+
+class JevCase(unittest.TestCase):
+    def setUp(self):
+        self.items, self.allowed = pc.load_evidence(VOICE, "", "")
+        self.env = mock.patch.dict(os.environ, {"TYPESAFE_API_KEY": "k" * 20})
+        self.env.start()
+        os.environ.pop("IG_JEV", None)
+        self.old = jev.set_transport(jev.TRANSPORT)
+
+    def tearDown(self):
+        jev.set_transport(self.old)
+        self.env.stop()
+
+
+class Questions(JevCase):
+    def test_wording_and_state(self):
+        sents = pc.l0("I lost $18,000 on one contract.\nKeep your hook short.", self.items, self.allowed)
+        q = pc.build_questions(sents, self.items)
+        self.assertEqual(q["kind_1"]["type"], "choice")
+        self.assertEqual(set(q["kind_1"]["criteria"]), set(KINDS))
+        self.assertEqual(q["kind_1"]["instructions"]["sentence"], "I lost $18,000 on one contract.")
+        same = [k for k in q if k.startswith("same_1_")]
+        self.assertEqual(len(same), min(pc.SHORTLIST, len(self.items)))
+        self.assertEqual(set(q["held_1_2"]["criteria"]), {"true", "false"})
+        self.assertIn("proof_item", q["same_1_2"]["instructions"])
+
+    def test_no_evidence_no_pairs(self):
+        sents = pc.l0("I lost $18,000 on one contract.", [], set())
+        self.assertEqual(list(pc.build_questions(sents, [])), ["kind_1"])
+
+
+class L1Policy(JevCase):
+    def run_with(self, draft, kind, same, held):
+        def ans(q, spec):
+            if q.startswith("kind_"):
+                return choice(kind)
+            fn = same if q.startswith("same_") else held
+            return {"type": "noul", "noul": fn(spec)}
+        jev.set_transport(fake(ans))
+        return pc.check(draft, self.items, self.allowed)
+
+    @staticmethod
+    def proof_is(needle, yes=0.9, no=0.05):
+        return lambda spec: yes if needle in spec["instructions"]["proof_item"] else no
+
+    def test_backed(self):
+        r = self.run_with("Proposals used to take me five hours. Twenty minutes now.", "own_record",
+                          self.proof_is("5 hours"), self.proof_is("5 hours"))
+        s = r["sentences"][0]
+        self.assertEqual((s["status"], s["proof"]), ("BACKED", "proof1"))
+        self.assertEqual((r["engine"], r["exit"]), ("jev", 0))
+
+    def test_unbacked(self):
+        r = self.run_with("I billed four hours a week for formatting. For two years.", "own_record",
+                          lambda s: 0.05, lambda s: 0.05)
+        self.assertEqual(r["sentences"][0]["status"], "UNBACKED")
+        self.assertEqual(r["exit"], 1)
+
+    def test_mismatch(self):
+        r = self.run_with("That carousel on pricing pages booked me 40 discovery calls.", "own_record",
+                          self.proof_is("carousel"), lambda s: 0.2)
+        s = r["sentences"][0]
+        self.assertEqual((s["status"], s["proof"]), ("MISMATCH", "proof3"))
+        self.assertTrue(any("your proof says" in n for n in s["notes"]))
+
+    def test_embellished(self):
+        r = self.run_with("My pricing carousel booked 14 calls in a single week.", "own_record",
+                          self.proof_is("carousel"), lambda s: 0.1)
+        self.assertEqual(r["sentences"][0]["status"], "EMBELLISHED")
+        self.assertEqual(r["exit"], 1)
+
+    def test_derived(self):
+        r = self.run_with("Proposals take me 15 times less time now.", "own_record",
+                          self.proof_is("5 hours"), lambda s: 0.2)
+        self.assertEqual(r["sentences"][0]["status"], "DERIVED")
+        self.assertEqual(r["exit"], 0)
+
+    def test_jev_widens_claims_never_narrows(self):
+        r = self.run_with("Loved your reel on retainer pricing last week.", "own_record",
+                          lambda s: 0.05, lambda s: 0.05)
+        self.assertTrue(r["sentences"][0]["claim"])
+        self.assertEqual(r["sentences"][0]["status"], "UNBACKED")
+        r = self.run_with("I billed four hours a week.", "advice_or_opinion", lambda s: 0.9, lambda s: 0.9)
+        s = r["sentences"][0]
+        self.assertTrue(s["claim"])
+        self.assertTrue(any(f["type"] == "number" for f in s["flags"]))
+        self.assertEqual(r["exit"], 1)
+
+    def test_jev_added_claim_gets_code_checks(self):
+        r = self.run_with("Last week Dana from the Austin expo sent over 40 referrals.", "client_result",
+                          lambda s: 0.05, lambda s: 0.05)
+        kinds = sorted(f["type"] for f in r["sentences"][0]["flags"])
+        self.assertEqual(kinds, ["name", "name", "number"])
+
+    def test_outside_fact_with_number_is_a_note(self):
+        r = self.run_with("Instagram caps hashtags at five per post.", "outside_fact",
+                          lambda s: 0.05, lambda s: 0.05)
+        s = r["sentences"][0]
+        self.assertFalse(s["claim"])
+        self.assertIn("statistic: add a source or cut", s["notes"])
+        self.assertEqual(r["exit"], 0)
+
+    def test_no_evidence_means_no_pairs_and_unbacked(self):
+        seen = []
+
+        def ans(q, spec):
+            seen.append(q)
+            return choice("own_record")
+        jev.set_transport(fake(ans))
+        r = pc.check("I made $50,000 last month.", [], set())
+        self.assertEqual(r["sentences"][0]["status"], "UNBACKED")
+        self.assertEqual([q for q in seen if not q.startswith("kind_")], [])
+
+    def test_summary_line(self):
+        r = self.run_with("I billed four hours a week for formatting. For two years.", "own_record",
+                          lambda s: 0.05, lambda s: 0.05)
+        text = pc.render(r)
+        self.assertTrue(text.startswith("engine: jev-1.13.0 (1 req"))
+        self.assertIn("proof: 0 backed, 2 {{…}}, 1 to confirm · engine jev-1.13.0", text)
+
+    def test_jev_failure_falls_back_whole_report(self):
+        def boom(body, timeout):
+            raise jev.JevUnavailable("rate-limited", "HTTP 429")
+        jev.set_transport(boom)
+        r = pc.check("I billed four hours a week.", self.items, self.allowed)
+        self.assertEqual((r["engine"], r["engine_reason"]), ("heuristic", "rate-limited"))
+        self.assertEqual(r["sentences"][0]["status"], "FLAGGED")
+
+
+class Fallback(unittest.TestCase):
+    def test_heuristic_line_and_unverified(self):
+        items, allowed = pc.load_evidence(VOICE, "", "")
+        with mock.patch.dict(os.environ, {"TYPESAFE_API_KEY": ""}):
+            os.environ.pop("IG_JEV", None)
+            r = pc.check("I have been following your work since the very first reel.", items, allowed)
+        self.assertEqual((r["engine"], r["engine_reason"]), ("heuristic", "no-key"))
+        self.assertEqual(r["sentences"][0]["status"], "UNVERIFIED")
+        self.assertEqual(r["exit"], 1)
+        self.assertTrue(pc.render(r).startswith("engine: heuristic (no-key)"))
+
+    def test_checked_when_numbers_found(self):
+        items, allowed = pc.load_evidence(VOICE, "", "")
+        r = pc.check("One carousel booked me 14 discovery calls in March.", items, allowed)
+        self.assertEqual(r["sentences"][0]["status"], "CHECKED")
+        self.assertEqual(r["exit"], 0)
+
+
+class CLI(unittest.TestCase):
+    def test_cli_off_writes_placeholders_and_exits_1(self):
+        with tempfile.TemporaryDirectory() as d:
+            draft, voice, out = (os.path.join(d, n) for n in ("d.txt", "v.md", "o.txt"))
+            write(draft, "I billed four hours a week for formatting.\n")
+            write(voice, VOICE)
+            p = run_cli("ig-human/proofcheck.py", [draft, "--voice", voice, "-o", out])
+            self.assertEqual(p.returncode, 1, p.stderr)
+            self.assertTrue(p.stdout.startswith("engine: heuristic (disabled)"), p.stdout)
+            self.assertEqual(read(out), "I billed {{your number}} a week for formatting.\n")
+
+    def test_json_output(self):
+        import json
+        with tempfile.TemporaryDirectory() as d:
+            draft, voice = os.path.join(d, "d.txt"), os.path.join(d, "v.md")
+            write(draft, "We cut proposal time from 5 hours to 20 minutes.\n")
+            write(voice, VOICE)
+            p = run_cli("ig-human/proofcheck.py", [draft, "--voice", voice, "--json"])
+            data = json.loads(p.stdout)
+            self.assertEqual(data["engine"], "heuristic")
+            self.assertEqual(data["sentences"][0]["status"], "CHECKED")
+            self.assertEqual(p.returncode, 0)
+
+    def test_engine_jev_without_key_exits_3(self):
+        with tempfile.TemporaryDirectory() as d:
+            draft = os.path.join(d, "d.txt")
+            write(draft, "Keep your hook short.\n")
+            p = run_cli("ig-human/proofcheck.py", [draft, "--voice", os.path.join(d, "none.md"),
+                                                   "--engine", "jev"])
+            self.assertEqual(p.returncode, 3, p.stdout + p.stderr)
+
+    def test_empty_draft_is_usage_error(self):
+        with tempfile.TemporaryDirectory() as d:
+            draft = os.path.join(d, "d.txt")
+            write(draft, "\n\n")
+            p = run_cli("ig-human/proofcheck.py", [draft])
+            self.assertEqual(p.returncode, 2)
 
 
 if __name__ == "__main__":
