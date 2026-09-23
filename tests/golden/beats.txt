@@ -1,0 +1,22 @@
+
+BEAT SHEET  ·  73 words  ·  ~26.6s at 165 wpm  ·  target 30.0s
+========================================================================
+  0:00.0   3.6s  HOOK    Proposals used to take me five hours. Twenty minutes now.
+                         ^ hook runs 3.6s, past the 3s mark
+  0:03.6   2.5s          Here is the template that did it.
+  0:06.2   5.1s          Scope goes on top, in one sentence the client can repeat back to you.
+                         ^ 5.1s on one beat
+  0:11.3   4.4s  MID     Price goes in the middle, one number, no ranges, no "starting at".
+                         ^ 4.4s on one beat
+  0:15.6   4.4s          The next step goes at the bottom, with a date on it.
+                         ^ 4.4s on one beat
+  0:20.0   1.8s          It works. Then everything changed.
+  0:21.8   2.9s          Comment TEMPLATE and I'll send it to you.
+  0:24.7   1.8s  CTA     Five hours to twenty minutes.
+------------------------------------------------------------------------
+  - Beat 1 takes 3.6s to say. Cut it to 8 words or fewer, or the hook lands after the decision has been made.
+  - Beat(s) 3, 4, 5 run past 4s. Either split the line or change what is on screen inside it. A static frame is where people leave.
+  - Beats 2-4 have nothing concrete in them. Put a number, a name or a price in one of them.
+  - Loops: the last beat repeats "five, hours, minutes" from the hook. Second watches are free reach.
+  - 3.5s under target. Either add 9 words or shoot it short. Short is usually right.
+

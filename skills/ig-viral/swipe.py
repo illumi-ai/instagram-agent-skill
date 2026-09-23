@@ -19,10 +19,17 @@ with a header line naming the columns:
 If you only have `followers`, leave median out and the script says so.
 `hook` is the first line of the reel, spoken or on screen, in their words.
 
+Formulas are named by ../ig-reel/formula.py: the hooks.json regex, checked
+against TypeSafe's Jev model when TYPESAFE_API_KEY is set. Only formulas the
+two agree on, or that Jev names with high confidence when the regex found
+nothing, are counted. Without Jev it is the regex alone, as it always was, and
+the first line of the output says which engine ran.
+
 Usage
   python3 swipe.py captured.tsv
   python3 swipe.py captured.tsv --out ~/.claude/instagram/swipe.md
   python3 swipe.py captured.tsv --json
+  python3 swipe.py captured.tsv --engine off      # regex only, no network
 """
 
 import argparse
@@ -42,10 +49,16 @@ try:                                              # optional: score the hooks to
 except Exception:                                 # ig-viral copied on its own
     score_hook = None
 
+try:                                              # regex + Jev formula names
+    from formula import classify_hooks            # noqa: E402
+except Exception:                                 # ig-reel not next to this folder
+    classify_hooks = None
+
 
 def load_formulas(path):
     try:
-        d = json.load(open(path, encoding="utf-8"))
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
     except Exception:
         return None
     by_id = {h["id"]: h for h in d["hooks"]}
@@ -91,13 +104,56 @@ def read_rows(path):
     return rows
 
 
-def analyse(rows, formulas):
+def name_formulas(rows, formulas, engine=None, hooks_path=HOOKS):
+    """Set formula_id, formula and formula_status on every row, one engine for all.
+
+    Returns the engine facts for the report.
+    """
+    fr = None
+    if classify_hooks and formulas:
+        fr = classify_hooks([r["hook"] for r in rows], engine=engine, hooks_path=hooks_path)
+    if fr is None:
+        for r in rows:
+            r["formula_id"], r["formula"] = classify(r["hook"], formulas)
+            r["formula_status"] = "REGEX" if r["formula_id"] else "unclassified"
+            r["formula_counted"] = r["formula_id"] is not None
+        reason = "client-missing" if not classify_hooks else "hooks-missing"
+        return {"engine": "heuristic", "engine_reason": reason, "engine_detail": None,
+                "model": None, "usage": None, "engine_line": f"engine: heuristic ({reason})",
+                "formula_engine": f"regex ({reason})", "hooks_version": _version(hooks_path)}
+    by_hook = {it["hook"]: it for it in fr["items"]}
+    for r in rows:
+        it = by_hook[r["hook"].strip()]
+        r["formula_status"], r["formula_counted"] = it["status"], it["counted"]
+        if it["counted"]:
+            r["formula_id"], r["formula"] = it["formula_id"], it["formula"]
+        else:
+            r["formula_id"] = None
+            r["formula"] = "unclassified" if it["status"] == "unclassified" else it["status"]
+    jev_on = fr["engine"] == "jev"
+    return {"engine": fr["engine"], "engine_reason": fr["engine_reason"],
+            "engine_detail": fr["engine_detail"], "model": fr["model"], "usage": fr["usage"],
+            "engine_line": fr["engine_line"],
+            "formula_engine": f"regex+{fr['model']}" if jev_on else f"regex ({fr['engine_reason']})",
+            "hooks_version": fr["hooks_version"]}
+
+
+def _version(path):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh).get("version", "?")
+    except Exception:
+        return "?"
+
+
+def analyse(rows, formulas, engine=None, hooks_path=HOOKS):
     used_median = any(r.get("median") for r in rows)
+    facts = name_formulas(rows, formulas, engine=engine, hooks_path=hooks_path)
+    jev_on = facts["engine"] == "jev"
     for r in rows:
         base = r.get("median") or r.get("followers") or 0
         r["baseline"] = base
         r["outlier"] = round(r["views"] / base, 2) if base else None
-        r["formula_id"], r["formula"] = classify(r["hook"], formulas)
         r["words"] = len(WORD_RE.findall(r["hook"]))
         if score_hook:
             _, overall, verdict, _ = score_hook(r["hook"])
@@ -114,8 +170,12 @@ def analyse(rows, formulas):
 
     counts = {}
     for r in top:
+        # With Jev, only formulas both engines stand behind are counted. The
+        # regex-only report counts the way it always has.
+        if jev_on and not r["formula_counted"]:
+            continue
         counts[r["formula"]] = counts.get(r["formula"], 0) + 1
-    return {
+    return dict(facts, **{
         "baseline": "account median" if used_median else "follower count",
         "n": len(ranked),
         "accounts": len({r.get("account", "") for r in ranked}),
@@ -125,13 +185,17 @@ def analyse(rows, formulas):
         "bottom_hook_score": med(bottom, "hook_score"),
         "top_words": med(top, "words"),
         "bottom_words": med(bottom, "words"),
-        "unclassified": sum(1 for r in ranked if r["formula"] == "unclassified"),
-    }
+        "unclassified": sum(1 for r in ranked if not r["formula_counted"]),
+        "jev_only": sum(1 for r in ranked if r["formula_status"] == "JEV"),
+        "read_by_hand": {s: sum(1 for r in ranked if r["formula_status"] == s)
+                         for s in ("DISPUTED", "NEW-SHAPE", "TENTATIVE")},
+    })
 
 
 def render(a, out=sys.stdout):
     head = (f"SWIPE FILE  ·  {a['n']} reels  ·  {a['accounts']} accounts  ·  "
             f"baseline: {a['baseline']}")
+    print(a["engine_line"], file=out)
     print("\n" + head, file=out)
     print("=" * max(len(head), 78), file=out)
     for r in a["reels"]:
@@ -146,6 +210,12 @@ def render(a, out=sys.stdout):
     if a["top_formulas"]:
         print("  top third by outlier:  "
               + ", ".join(f"{n} x{c}" for n, c in a["top_formulas"][:4]), file=out)
+    if a["engine"] == "jev":
+        print(f"  counted by jev only:   {a['jev_only']}", file=out)
+        rb = a["read_by_hand"]
+        if any(rb.values()):
+            print(f"  read by hand:          {rb['DISPUTED']} disputed, {rb['NEW-SHAPE']} new shape, "
+                  f"{rb['TENTATIVE']} tentative", file=out)
     if a["top_hook_score"] is not None:
         print(f"  median hook score:     top {a['top_hook_score']:.0f}  "
               f"vs bottom {a['bottom_hook_score']:.0f}", file=out)
@@ -161,7 +231,8 @@ def render(a, out=sys.stdout):
 def to_markdown(a):
     lines = ["# Swipe file", "",
              f"{a['n']} reels across {a['accounts']} accounts. "
-             f"Ranked by multiple over {a['baseline']}.", ""]
+             f"Ranked by multiple over {a['baseline']}.",
+             f"formula engine: {a['formula_engine']} · hooks.json v{a['hooks_version']}", ""]
     for r in a["reels"]:
         mult = f"{r['outlier']:.1f}x" if r["outlier"] else "?"
         lines += [f"## {mult}  {r['formula']}  ({r.get('account', '')})",
@@ -177,6 +248,8 @@ def main():
     ap.add_argument("--hooks", default=HOOKS, help="path to ig-reel/hooks.json")
     ap.add_argument("--out", help="also write the swipe file as markdown here")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--engine", choices=["auto", "jev", "off"],
+                    help="auto (default): Jev checks the formula names when TYPESAFE_API_KEY is set")
     args = ap.parse_args()
 
     rows = read_rows(args.input)
@@ -185,7 +258,7 @@ def main():
               file=sys.stderr)
         sys.exit(2)
     formulas = load_formulas(args.hooks)
-    a = analyse(rows, formulas)
+    a = analyse(rows, formulas, engine=args.engine, hooks_path=args.hooks)
     if not formulas:
         print("note: hooks.json not found, formulas not named. Pass --hooks.", file=sys.stderr)
     if score_hook is None:
@@ -200,6 +273,8 @@ def main():
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, "w", encoding="utf-8").write(to_markdown(a))
         print(f"wrote {path}", file=sys.stderr)
+    if args.engine == "jev" and a["engine"] != "jev":
+        sys.exit(3)
 
 
 if __name__ == "__main__":

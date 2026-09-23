@@ -1,0 +1,32 @@
+engine: heuristic (disabled)
+
+SWIPE FILE  ·  9 reels  ·  5 accounts  ·  baseline: account median
+==============================================================================
+    44.4x  hook  42  -   unclassified           @solo_sam           40,000
+           "proposals used to eat my whole friday. now they take me twenty minutes"
+    37.5x  hook  87  #3  Nobody Tells You       @studio_a          412,000
+           "nobody tells you your first 30 reels are supposed to flop"
+    32.0x  hook  51  #7  Wrong Way, Right Way   @pricing_pat        96,000
+           "you're pricing your services wrong and honestly it's not your fault"
+    32.0x  hook  84  #4  The Replacement        @maker_mo           64,000
+           "this $9 app replaced my $300 a month virtual assistant"
+    25.0x  hook  42  #3  Nobody Tells You       @coach_kim         150,000
+           "is it just me or does nobody talk about how lonely freelancing gets"
+     0.9x  hook  13  -   unclassified           @maker_mo            1,800
+           "in this video i'm going to show you my morning routine"
+     0.8x  hook  59  #6  The Receipt            @pricing_pat         2,500
+           "so i just got banned from instagram for 30 days"
+     0.8x  hook  51  #26 The Superlative        @coach_kim           5,000
+           "the fastest way to lose a client is to answer every email in five minutes"
+     0.8x  hook  10  -   unclassified           @studio_a            9,000
+           "hey guys welcome back to my channel"
+------------------------------------------------------------------------------
+WHAT IS WORKING IN THIS BATCH
+  top third by outlier:  unclassified x1, Nobody Tells You x1, Wrong Way, Right Way x1
+  median hook score:     top 51  vs bottom 51
+  median hook length:    top 11 words  vs bottom 10 words
+  unclassified:          3 of 9. Read those by hand, they are where a formula you do not have yet is hiding.
+
+  A hand-collected batch is evidence, not proof. Twelve reels shows you nothing;
+  forty across six accounts shows you something. Collect more before you believe it.
+

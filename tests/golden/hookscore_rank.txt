@@ -1,0 +1,16 @@
+
+HOOK RANKING
+==============================================================================
+->  85.6 STRONG  Nobody tells you that your first 30 reels are supposed to f...
+        weakest: SPECIFICITY (75)
+    81.4 STRONG  $18,000 is what one missing clause cost me.
+        weakest: ADDRESS (70)
+    40.8 WEAK    Social proof is the only thing that sells a retainer.
+        weakest: SPECIFICITY (15)
+    30.0 WEAK    It works. Then everything changed.
+        weakest: SPECIFICITY (15)
+    24.6 WEAK    So today I want to talk about pricing.
+        weakest: FRONTLOAD (0)
+
+Shoot the top one. If the top one is under 50, none of these are the hook.
+

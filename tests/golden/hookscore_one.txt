@@ -1,0 +1,18 @@
+
+HOOK SCORE
+==============================================================
+  "$18,000 is what one missing clause cost me."
+
+  LENGTH        ######################## 100.0
+                8 words, 43 chars, ~2.9s spoken (want 5-12 words)
+  SPECIFICITY   ##################......  75.0
+                1 concrete marker(s): $18,000
+  STAKES        ######################## 100.0
+                2 tension marker(s): cost, a price
+  FRONTLOAD     ######################## 100.0
+                payload at word 1
+  ADDRESS       #################.......  70.0
+                first person, no viewer named
+--------------------------------------------------------------
+  HOOK SCORE    ####################....  81.4   STRONG
+

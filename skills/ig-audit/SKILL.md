@@ -25,7 +25,16 @@ Ask for whichever the user has:
 - Or just the posts and their view counts, which is enough for a first pass.
 
 Also read `~/.claude/instagram/log.md` if it exists, since it records which
-hook formula each post used.
+hook formula each post used. For posts the log does not cover, transcribe the
+first line of each and name the formula with the same classifier `/ig-viral`
+uses:
+
+```bash
+python3 ../ig-reel/formula.py "first line of post 1" "first line of post 2" ...
+```
+
+Use only the counted statuses (AGREE and JEV with Jev on, REGEX without it)
+and say which engine named them. Leave the rest unnamed rather than guessing.
 
 ## What to actually measure
 

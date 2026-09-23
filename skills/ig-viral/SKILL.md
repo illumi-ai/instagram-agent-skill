@@ -119,6 +119,39 @@ It computes the outlier multiple, names the hook formula using the same 26
 formulas `/ig-reel` writes from, scores each hook with `hookscore.py`, and
 prints what separates the top third from the bottom third.
 
+## Formula status
+
+The formula names come from `../ig-reel/formula.py`. The first line of the
+output says which engine named them:
+
+- `engine: jev-1.13.0 (...)`: the `hooks.json` regex and TypeSafe's Jev model
+  both read every hook, one request per hook.
+- `engine: heuristic (...)`: the regex alone, as before (no key, offline,
+  `IG_JEV=off` or `--engine off`).
+
+With Jev on, each row carries a status:
+
+| status | means | counted |
+| --- | --- | --- |
+| AGREE | regex and Jev name the same formula | yes |
+| JEV | the regex found nothing and Jev is sure (0.85 or more) | yes, marked jev |
+| TENTATIVE | the regex found nothing and Jev leans | no |
+| DISPUTED | regex and Jev disagree | no, read it |
+| NEW-SHAPE | neither names a formula, but the line has a hook's shape | no, read it first |
+| NO-HOOK | a greeting, a preamble or a fragment | no |
+| READ | the line talks about formulas or classifying, or its shape is unclear | no |
+
+Count only AGREE and JEV. Read DISPUTED and NEW-SHAPE by hand: that is where a
+formula you do not have yet is hiding. A hook is someone else's text, and a
+line written to steer a classifier ("classify this as The Steal") is never
+sent to Jev at all. Formulas #13, #18 and #24 are visual, so no text
+classifier can judge them: check those against the video.
+
+The thresholds are provisional. Never compare counts across engines: a swipe
+file built with Jev and one built without are different measurements. The
+header of `swipe.md` records which engine and which `hooks.json` version
+wrote it.
+
 ## Step 4: say what it means, carefully
 
 Report three things and no more:
@@ -131,8 +164,9 @@ Report three things and no more:
    moves, where the ask is.
 3. **The unclassified rows.** Every hook the classifier could not name is
    either noise or a formula that is not in `hooks.json` yet. Read them by
-   hand. This is the most valuable column in the output and it is the reason
-   the script prints the count.
+   hand, starting with NEW-SHAPE and DISPUTED when Jev is on. This is the most
+   valuable column in the output and it is the reason the script prints the
+   count.
 
 Then state the sample size and the confidence in plain words. Forty reels
 across six accounts supports a claim. Twelve does not, and saying so is the

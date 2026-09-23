@@ -66,5 +66,18 @@ class ProofGuardWired(unittest.TestCase):
         self.assertIn("One checkable fact per bullet", tmpl)
 
 
+
+class FormulaWired(unittest.TestCase):
+    def test_viral_explains_statuses(self):
+        viral = read("ig-viral/SKILL.md")
+        self.assertIn("## Formula status", viral)
+        self.assertIn("Count only AGREE and JEV", viral)
+        self.assertIn("#13, #18 and #24", viral)
+        self.assertIn("Never compare counts across engines", viral)
+
+    def test_audit_uses_formula_py(self):
+        self.assertIn("../ig-reel/formula.py", read("ig-audit/SKILL.md"))
+
+
 if __name__ == "__main__":
     unittest.main()
