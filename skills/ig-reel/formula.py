@@ -141,7 +141,7 @@ def _load_jev():
 def _item(hook, rid, rname):
     return {"hook": hook, "regex_id": rid, "regex_name": rname, "jev_id": None, "jev_name": None,
             "confidence": None, "has_shape": None, "status": None, "counted": False,
-            "formula_id": None, "formula": None, "top": [], "reason": None}
+            "formula_id": None, "formula": None, "top": [], "reason": None, "judgments": {}}
 
 
 def classify_hooks(hooks, engine=None, hooks_path=HOOKS, selftest_ids=None):
@@ -192,6 +192,7 @@ def classify_hooks(hooks, engine=None, hooks_path=HOOKS, selftest_ids=None):
             jid = data["slug_to_id"].get(f["choice"])
             it.update(jev_id=jid, jev_name=by_id[jid]["name"] if jid else "none",
                       confidence=round(f["confidence"], 3), has_shape=round(shape, 3),
+                      judgments=answers,
                       top=sorted(((k, round(v, 3)) for k, v in f["probabilities"].items()),
                                  key=lambda kv: -kv[1])[:3])
             it["status"] = status_for(it["regex_id"], f["choice"], f["confidence"], shape,

@@ -86,3 +86,13 @@ Say "write Tuesday" and I will draft it.
 Then draft on request, one at a time, each through `/ig-reel` and `/ig-human`.
 Do not dump four finished scripts at once. They will all sound the same and the
 user will shoot none of them.
+
+The source is the evidence. Save it to a file and check every draft against
+it, so a number or a story that drifted in the rewrite comes back flagged:
+
+```bash
+python3 ../ig-human/proofcheck.py draft.txt --source source.txt --said said.txt
+```
+
+Only the user's own asset counts as `--source`. A transcript of somebody
+else's video, or a guest's words on the user's podcast, is not their record.

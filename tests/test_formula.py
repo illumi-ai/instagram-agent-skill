@@ -94,6 +94,7 @@ class Classify(unittest.TestCase):
                                "Nobody tells you that your first 30 reels are supposed to flop.",
                                "Steal this four-line follow-up. It took me two years."])
         self.assertEqual([i["status"] for i in r["items"]], ["JEV", "AGREE", "AGREE"])
+        self.assertEqual(set(r["items"][0]["judgments"]), {"formula", "has_shape"})
         jev.set_transport(transport_for(lambda h: "none", shape=0.9))
         r = fm.classify_hooks(["Steal this four-line follow-up. It took me two years."])
         self.assertEqual(r["items"][0]["status"], "DISPUTED")

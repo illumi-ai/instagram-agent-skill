@@ -59,8 +59,9 @@ class ProofGuardWired(unittest.TestCase):
         reel = read("ig-reel/SKILL.md")
         self.assertIn("proofcheck.py", reel)
         self.assertRegex(reel, r"proof:\s+\d+ backed, \d+ \{\{…\}\}, \d+ to confirm · engine")
-        for rel in ("ig-story/SKILL.md", "ig-reply/SKILL.md"):
+        for rel in ("ig-story/SKILL.md", "ig-reply/SKILL.md", "ig-repurpose/SKILL.md"):
             self.assertIn("../ig-human/proofcheck.py", read(rel), rel)
+        self.assertIn("--source source.txt", read("ig-repurpose/SKILL.md"))
 
     def test_voice_template_asks_for_checkable_facts(self):
         tmpl = read_path(os.path.join(ROOT, "templates", "voice.md"))
