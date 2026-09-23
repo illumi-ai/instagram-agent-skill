@@ -1,0 +1,54 @@
+{
+ "answers": {
+  "held_1_0": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "held_1_1": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "held_1_2": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "held_1_3": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "kind_1": {
+   "choice": "own_record",
+   "confidence": 1.0,
+   "probabilities": {
+    "advice_or_opinion": 0.0,
+    "ask_or_other": 0.0,
+    "client_result": 0.0,
+    "hypothetical": 0.0,
+    "outside_fact": 0.0,
+    "own_record": 1.0
+   },
+   "type": "choice"
+  },
+  "same_1_0": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "same_1_1": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "same_1_2": {
+   "noul": 0.02,
+   "type": "noul"
+  },
+  "same_1_3": {
+   "noul": 0.01,
+   "type": "noul"
+  }
+ },
+ "model": "jev-1.13.0",
+ "usage": {
+  "input_tokens": 1885,
+  "output_tokens": 235
+ }
+}

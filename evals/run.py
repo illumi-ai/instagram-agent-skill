@@ -68,7 +68,11 @@ class ReplayTransport:
         if not self.live:
             if os.path.exists(path):
                 with open(path, encoding="utf-8") as fh:
-                    return json.load(fh)
+                    resp = json.load(fh)
+                with self.lock:
+                    self.requests += 1
+                    self.input_tokens += int((resp.get("usage") or {}).get("input_tokens", 0))
+                return resp
             with self.lock:
                 self.missing.append(k)
             raise MissingRecording(k)
@@ -254,7 +258,7 @@ def run_suite(name, root=RECORDED, live=False, record=False):
             "input_tokens": transport.input_tokens,
             "cost_usd": round(transport.input_tokens * USD_PER_MTOK / 1e6, 5),
             "provenance": dict(Counter(i["provenance"] for i in data["items"])),
-            "note": data.get("caveat") or data.get("labels") or ""}
+            "notes": [n for n in (data.get("labels"), data.get("caveat")) if n]}
 
 
 def render_report(results, when):
@@ -268,16 +272,20 @@ def render_report(results, when):
              "**Smoke test, not a benchmark.** Every suite is small and was written and labelled by "
              "the agents that built these features (`provenance` in each suite file). The "
              "thresholds in the scripts are provisional until real, human-labelled data exists.",
+             "",
+             "What these numbers do not show: accuracy on real creators' drafts, hooks or captions; "
+             "stability across runs (the probes measured drift of up to 0.14 on a 0-2 scale); or any "
+             "effect on views. \"On by default\" below applies the spec's rule (a feature whose gate "
+             "fails ships switched off). It is not a claim that the feature is right on your data.",
              ""]
     for r in results:
         passed = all(r["gates"].values())
         lines += [f"## {r['suite']}", "",
                   f"- items by provenance: {', '.join(f'{k} {v}' for k, v in r['provenance'].items())}",
-                  f"- live requests: {r['requests']}, input tokens: {r['input_tokens']:,}, "
-                  f"cost: ${r['cost_usd']:.4f}" if r["live"] else "- replayed",
+                  f"- requests: {r['requests']}, input tokens: {r['input_tokens']:,}, cost at "
+                  f"recording: ${r['cost_usd']:.4f}",
                   f"- complete (every answer from Jev): {'yes' if r['complete'] else 'NO'}"]
-        if r["note"]:
-            lines.append(f"- note: {r['note']}")
+        lines += [f"- note: {n}" for n in r["notes"]]
         lines += ["", "| metric | value |", "| --- | --- |"]
         for k, v in r["metrics"].items():
             lines.append(f"| {k} | {v if not isinstance(v, (list, dict)) or v else '-'} |")
@@ -320,8 +328,8 @@ def main():
             code = 1
         elif not r["complete"]:
             code = 1
-    if args.live:
-        print(f"\ncost: ${cost:.4f} at ${USD_PER_MTOK} per million input tokens")
+    print(f"\ncost{'' if args.live else ' at recording'}: ${cost:.4f} at ${USD_PER_MTOK} per "
+          "million input tokens")
     if args.report:
         with open(REPORT, "w", encoding="utf-8") as fh:
             fh.write(render_report(results, datetime.date.today().isoformat()))

@@ -1,0 +1,46 @@
+{
+ "answers": {
+  "held_1_0": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "held_1_1": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "held_1_2": {
+   "noul": 0.02,
+   "type": "noul"
+  },
+  "kind_1": {
+   "choice": "client_result",
+   "confidence": 0.74,
+   "probabilities": {
+    "advice_or_opinion": 0.0,
+    "ask_or_other": 0.0,
+    "client_result": 0.78,
+    "hypothetical": 0.0,
+    "outside_fact": 0.0,
+    "own_record": 0.22
+   },
+   "type": "choice"
+  },
+  "same_1_0": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "same_1_1": {
+   "noul": 0.01,
+   "type": "noul"
+  },
+  "same_1_2": {
+   "noul": 0.04,
+   "type": "noul"
+  }
+ },
+ "model": "jev-1.13.0",
+ "usage": {
+  "input_tokens": 1484,
+  "output_tokens": 195
+ }
+}

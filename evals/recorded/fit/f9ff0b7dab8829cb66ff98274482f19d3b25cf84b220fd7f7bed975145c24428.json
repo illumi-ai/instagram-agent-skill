@@ -1,0 +1,117 @@
+{
+ "answers": {
+  "fit_1": {
+   "noul": 0.13,
+   "type": "noul"
+  },
+  "fit_10": {
+   "noul": 0.65,
+   "type": "noul"
+  },
+  "fit_11": {
+   "noul": 0.06,
+   "type": "noul"
+  },
+  "fit_12": {
+   "noul": 0.06,
+   "type": "noul"
+  },
+  "fit_13": {
+   "noul": 0.55,
+   "type": "noul"
+  },
+  "fit_14": {
+   "noul": 0.06,
+   "type": "noul"
+  },
+  "fit_15": {
+   "noul": 0.05,
+   "type": "noul"
+  },
+  "fit_16": {
+   "noul": 0.03,
+   "type": "noul"
+  },
+  "fit_17": {
+   "noul": 0.07,
+   "type": "noul"
+  },
+  "fit_18": {
+   "noul": 0.15,
+   "type": "noul"
+  },
+  "fit_19": {
+   "noul": 0.04,
+   "type": "noul"
+  },
+  "fit_2": {
+   "noul": 0.51,
+   "type": "noul"
+  },
+  "fit_20": {
+   "noul": 0.18,
+   "type": "noul"
+  },
+  "fit_21": {
+   "noul": 0.11,
+   "type": "noul"
+  },
+  "fit_22": {
+   "noul": 0.08,
+   "type": "noul"
+  },
+  "fit_23": {
+   "noul": 0.05,
+   "type": "noul"
+  },
+  "fit_24": {
+   "noul": 0.44,
+   "type": "noul"
+  },
+  "fit_25": {
+   "noul": 0.04,
+   "type": "noul"
+  },
+  "fit_26": {
+   "noul": 0.31,
+   "type": "noul"
+  },
+  "fit_3": {
+   "noul": 0.24,
+   "type": "noul"
+  },
+  "fit_4": {
+   "noul": 0.05,
+   "type": "noul"
+  },
+  "fit_5": {
+   "noul": 0.94,
+   "type": "noul"
+  },
+  "fit_6": {
+   "noul": 0.05,
+   "type": "noul"
+  },
+  "fit_7": {
+   "noul": 0.21,
+   "type": "noul"
+  },
+  "fit_8": {
+   "noul": 0.02,
+   "type": "noul"
+  },
+  "fit_9": {
+   "noul": 0.34,
+   "type": "noul"
+  },
+  "multi_idea": {
+   "noul": 0.14,
+   "type": "noul"
+  }
+ },
+ "model": "jev-1.13.0",
+ "usage": {
+  "input_tokens": 5405,
+  "output_tokens": 507
+ }
+}

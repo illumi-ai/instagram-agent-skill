@@ -1,0 +1,49 @@
+{
+ "answers": {
+  "s1_ask_type": {
+   "choice": "no_ask",
+   "confidence": 0.5,
+   "probabilities": {
+    "comment_keyword": 0.0,
+    "comment_reply": 0.44,
+    "dm": 0.0,
+    "follow": 0.0,
+    "link_in_bio": 0.0,
+    "no_ask": 0.56,
+    "save": 0.0,
+    "share_or_send": 0.0,
+    "swipe": 0.0
+   },
+   "type": "choice"
+  },
+  "s1_is_ask": {
+   "noul": 0.1,
+   "type": "noul"
+  },
+  "s2_ask_type": {
+   "choice": "no_ask",
+   "confidence": 0.99,
+   "probabilities": {
+    "comment_keyword": 0.0,
+    "comment_reply": 0.0,
+    "dm": 0.0,
+    "follow": 0.0,
+    "link_in_bio": 0.0,
+    "no_ask": 1.0,
+    "save": 0.0,
+    "share_or_send": 0.0,
+    "swipe": 0.0
+   },
+   "type": "choice"
+  },
+  "s2_is_ask": {
+   "noul": 0.04,
+   "type": "noul"
+  }
+ },
+ "model": "jev-1.13.0",
+ "usage": {
+  "input_tokens": 1167,
+  "output_tokens": 229
+ }
+}

@@ -1,0 +1,47 @@
+{
+ "answers": {
+  "formula": {
+   "choice": "time_collapse",
+   "confidence": 1.0,
+   "probabilities": {
+    "before_and_after_on_screen": 0.0,
+    "cold_open_demo": 0.0,
+    "contrarian_flip": 0.0,
+    "cost_confession": 0.0,
+    "head_to_head": 0.0,
+    "if_this_then_watch": 0.0,
+    "insider_leak": 0.0,
+    "mid_sentence_start": 0.0,
+    "negative_command": 0.0,
+    "nobody_tells_you": 0.0,
+    "none": 0.0,
+    "numbered_with_a_favourite": 0.0,
+    "permission": 0.0,
+    "someone_else_s_result": 0.0,
+    "the_callout": 0.0,
+    "the_deadline": 0.0,
+    "the_flop_record": 0.0,
+    "the_objection": 0.0,
+    "the_receipt": 0.0,
+    "the_replacement": 0.0,
+    "the_reveal": 0.0,
+    "the_statistic": 0.0,
+    "the_steal": 0.0,
+    "the_superlative": 0.0,
+    "the_verbatim_question": 0.0,
+    "time_collapse": 1.0,
+    "wrong_way_right_way": 0.0
+   },
+   "type": "choice"
+  },
+  "has_shape": {
+   "noul": 0.86,
+   "type": "noul"
+  }
+ },
+ "model": "jev-1.13.0",
+ "usage": {
+  "input_tokens": 2086,
+  "output_tokens": 299
+ }
+}

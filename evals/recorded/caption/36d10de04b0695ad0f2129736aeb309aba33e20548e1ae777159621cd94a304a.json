@@ -1,0 +1,29 @@
+{
+ "answers": {
+  "s1_ask_type": {
+   "choice": "comment_reply",
+   "confidence": 0.83,
+   "probabilities": {
+    "comment_keyword": 0.0,
+    "comment_reply": 0.85,
+    "dm": 0.0,
+    "follow": 0.0,
+    "link_in_bio": 0.0,
+    "no_ask": 0.15,
+    "save": 0.0,
+    "share_or_send": 0.0,
+    "swipe": 0.0
+   },
+   "type": "choice"
+  },
+  "s1_is_ask": {
+   "noul": 0.82,
+   "type": "noul"
+  }
+ },
+ "model": "jev-1.13.0",
+ "usage": {
+  "input_tokens": 725,
+  "output_tokens": 115
+ }
+}

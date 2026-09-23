@@ -689,5 +689,6 @@
       "provenance": "probe-synthetic"
     }
   ],
-  "provenance_note": "probe-synthetic: the sentence and its label both come from the probes (fab_*). repo: probe sentences labelled while building this suite, so the labels are not blind."
+  "provenance_note": "probe-synthetic: the sentence and its label both come from the probes (fab_*). repo: probe sentences labelled while building this suite, so the labels are not blind.",
+  "caveat": "Most labels (repo) were written while building this suite, some of them after seeing a live proofcheck run on the reel case; one ambiguous reel line and one DM line were left out rather than labelled. Only the fab_* items carry labels from the probes."
 }
