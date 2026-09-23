@@ -1,0 +1,25 @@
+engine: heuristic (disabled)
+
+CAPTION LINT  ·  394 / 2200 chars  ·  3 hashtags  ·  1 ask(s)
+==============================================================
+
+  WHAT THE FEED SHOWS
+  +------------------------------------------------------+
+  | Proposals used to take me five hours. Now they take  |
+  | twenty minutes.                                      |
+  |                                                      |
+  | The fix was one template. Scope on top, one price in |
+  | the                                                  |
+  +-------------------------------------------- ... more +
+
+  PASS  LENGTH            394 / 2200 characters
+  PASS  FIRST LINE        67 characters, lands whole
+  PASS  HOOK IS CONCRETE  2 number(s) or name(s) in the visible window
+  PASS  HASHTAGS          3 tag(s): #proposals #freelancebusiness #clientwork
+  PASS  TAG PLACEMENT     tags are below the fold
+  PASS  LINKS             no dead links in the body
+  PASS  ONE ASK           one call to action: comment a keyword
+  PASS  EMOJI             0 emoji, 0.0 per 100 characters
+--------------------------------------------------------------
+  VERDICT  READY
+

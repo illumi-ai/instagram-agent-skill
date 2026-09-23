@@ -5,10 +5,11 @@ import re
 import unittest
 
 from tests.support import ROOT, SKILLS, load
+from tests.support import read as read_path
 
 
 def read(rel):
-    return open(os.path.join(SKILLS, rel), encoding="utf-8").read()
+    return read_path(os.path.join(SKILLS, rel))
 
 
 class Phase0Docs(unittest.TestCase):
@@ -62,7 +63,7 @@ class ProofGuardWired(unittest.TestCase):
             self.assertIn("../ig-human/proofcheck.py", read(rel), rel)
 
     def test_voice_template_asks_for_checkable_facts(self):
-        tmpl = open(os.path.join(ROOT, "templates", "voice.md"), encoding="utf-8").read()
+        tmpl = read_path(os.path.join(ROOT, "templates", "voice.md"))
         self.assertIn("One checkable fact per bullet", tmpl)
 
 
@@ -87,6 +88,16 @@ class FitWired(unittest.TestCase):
         self.assertIn("only from WRITABLE", reel)
         self.assertRegex(reel, r"fit:\s+\d+ writable, \d+ unlockable, \d+ vetoed")
         self.assertIn("fit: skipped", reel)
+
+
+
+class CaptionWired(unittest.TestCase):
+    def test_caption_explains_the_engine(self):
+        text = read("ig-caption/SKILL.md")
+        self.assertIn("engine:", text)
+        self.assertIn("never turns into FAIL", text)
+        self.assertIn("borderline, decide out loud", text)
+        self.assertIn("IG_JEV=off", text)
 
 
 if __name__ == "__main__":

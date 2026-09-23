@@ -8,7 +8,8 @@ from tests.support import SKILLS, load
 
 
 def lexicon():
-    return json.load(open(os.path.join(SKILLS, "ig-human", "slop.json"), encoding="utf-8"))
+    with open(os.path.join(SKILLS, "ig-human", "slop.json"), encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 class HookscoreFrontload(unittest.TestCase):

@@ -55,7 +55,8 @@ class HooksRegex(unittest.TestCase):
     def setUp(self):
         self.swipe = load("swipe")
         self.formulas = self.swipe.load_formulas(HOOKS)
-        self.data = json.load(open(HOOKS, encoding="utf-8"))
+        with open(HOOKS, encoding="utf-8") as fh:
+            self.data = json.load(fh)
 
     def test_every_example_classifies_as_itself(self):
         for h in self.data["hooks"]:

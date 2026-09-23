@@ -17,6 +17,7 @@ CASES = [
     ("beats", "ig-reel/beats.py", ["tests/fixtures/script.txt", "--target", "30"]),
     ("detect", "ig-human/detect.py", ["tests/fixtures/draft.txt"]),
     ("swipe", "ig-viral/swipe.py", ["tests/fixtures/swipe.tsv", "--engine", "off"]),
+    ("caption", "ig-caption/caption.py", ["tests/fixtures/caption.txt", "--engine", "off"]),
 ]
 
 

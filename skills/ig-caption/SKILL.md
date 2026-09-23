@@ -21,6 +21,28 @@ It prints the caption the way the feed prints it: the first 125 characters in a
 box, everything else behind the tap. Read that box before you read anything
 else you wrote.
 
+**Which engine read the asks.** The first line of the output says it:
+
+- `engine: jev-1.13.0 (...)`: TypeSafe's Jev model read every sentence and
+  said whether it asks the reader to do something, and what. It finds the
+  paraphrased ask ("it's linked on my profile") and ignores the quoted one
+  ("she told me to share it").
+- `engine: heuristic (...)`: the built-in regex list read the asks, as
+  before (no key, offline, `--engine off` or `IG_JEV=off`).
+
+Code still counts the asks and applies the one-ask rule.
+A Jev reading never turns into FAIL: at most it is a WARN.
+Three lines can follow the checks:
+
+- `note  possible ask (p)`: a sentence Jev is unsure about, not counted.
+- `note  borderline, decide out loud`: counting that sentence or not would
+  change the ONE ASK result. Tell the user which sentence is the ask and
+  rewrite the other so it is plainly not one.
+- `note  regex vs jev`: the two readings disagree. Read the sentence and say
+  which is right.
+
+The thresholds are provisional. Never compare verdicts across engines.
+
 ## First, decide which job this caption has
 
 This is the decision that ruins captions when it is skipped.
