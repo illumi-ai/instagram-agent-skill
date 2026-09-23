@@ -20,8 +20,9 @@ someone else wrote, so it is never trusted alone:
              shape is unclear
 
 Without Jev (no TYPESAFE_API_KEY, offline, IG_JEV=off, --engine off) the result
-is the regex alone, status REGEX or unclassified, exactly as before. One engine
-per run: counts from different engines are not comparable.
+is the regex alone, status REGEX or unclassified, as before, except that a line
+talking about formulas or classifying is READ and never counted with either
+engine. One engine per run: counts from different engines are not comparable.
 
 Formulas #13, #18 and #24 are visual. A text classifier cannot judge them.
 
@@ -183,10 +184,11 @@ def classify_hooks(hooks, engine=None, hooks_path=HOOKS, selftest_ids=None):
     by_id = data["by_id"]
     for it in items:
         answers = it.pop("_answers", None)
-        if result is None:
-            it["status"] = "REGEX" if it["regex_id"] else "unclassified"
-        elif answers is None:
+        if META_RE.search(it["hook"]):
+            # Text written to steer a classifier is never counted, by either engine.
             it["status"], it["reason"] = "READ", "classification language in the hook"
+        elif result is None:
+            it["status"] = "REGEX" if it["regex_id"] else "unclassified"
         else:
             f, shape = answers["formula"], answers["has_shape"]["noul"]
             jid = data["slug_to_id"].get(f["choice"])
@@ -222,6 +224,13 @@ def _summary(jev, results):
              "output_tokens": sum(r.usage.get("output_tokens", 0) for r in results)}
     return jev.Result(answers={}, model=results[0].model, usage=usage,
                       elapsed_s=max(r.elapsed_s for r in results), requests=len(results))
+
+
+def jev_missing(engine, r):
+    """--engine jev was asked for and Jev did not answer (a batch with nothing
+    to ask does not count as missing)."""
+    return (engine == "jev" and r["engine"] != "jev"
+            and r.get("engine_detail") != "nothing to ask")
 
 
 def describe(it):
@@ -301,7 +310,7 @@ def main():
         sys.exit(2)
 
     r = classify_hooks(hooks, engine=args.engine, selftest_ids=selftest_ids)
-    code = 3 if args.engine == "jev" and r["engine"] != "jev" else 0
+    code = 3 if jev_missing(args.engine, r) else 0
     if args.selftest:
         expected = dict(zip(hooks, selftest_ids))
         right = sum(it["counted"] and it["formula_id"] == expected[it["hook"]] for it in r["items"])

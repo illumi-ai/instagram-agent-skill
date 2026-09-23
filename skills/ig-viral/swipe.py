@@ -273,7 +273,8 @@ def main():
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, "w", encoding="utf-8").write(to_markdown(a))
         print(f"wrote {path}", file=sys.stderr)
-    if args.engine == "jev" and a["engine"] != "jev":
+    if (args.engine == "jev" and a["engine"] != "jev"
+            and a.get("engine_detail") != "nothing to ask"):
         sys.exit(3)
 
 

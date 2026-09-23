@@ -36,7 +36,7 @@
         "a common habit the viewer should stop",
         "the alternative to do instead"
       ],
-      "match": "^\\s*(?:stop|quit)\\s+(?!scrolling\\b)\\w+ing\\b|^\\s*(?:never|don'?t|dont|do not)\\s+(?:do|be|make|buy|use|start|say|post|send|take|charge|pay|sign|hire|give|offer|work|price|discount|reply|answer|write|run)\\b|\\bquit your\\b|[.!]\\s*(?:do|post|use|send|try)\\b[^.!?]*\\binstead\\b"
+      "match": "^\\s*(?:stop|quit)\\s+(?!scrolling\\b)\\w+ing\\b|^\\s*(?:never|don['’]?t|dont|do not)\\s+(?:do|be|make|buy|use|start|say|post|send|take|charge|pay|sign|hire|give|offer|work|price|discount|reply|answer|write|run)\\b|\\bquit your\\b|[.!]\\s*(?:do|post|use|send|try)\\b[^.!?]*\\binstead\\b"
     },
     {
       "id": 3,
@@ -137,7 +137,7 @@
         "a reusable artifact the viewer can copy",
         "how long it took to get right"
       ],
-      "match": "^\\s*steal\\b|(?<!n't )(?<!not )(?<!dont )\\bsteal (?:this|these|my)\\b|^\\s*(?:here'?s|this is) (?:the|my) (?:exact|literal)\\b"
+      "match": "^\\s*steal\\b|(?<!n't )(?<!n’t )(?<!not )(?<!dont )(?<!never )\\bsteal (?:this|these|my)\\b|^\\s*(?:here['’]?s|this is) (?:the|my) (?:exact|literal)\\b"
     },
     {
       "id": 10,
@@ -209,7 +209,7 @@
         "a specific group of viewers",
         "the thing that group has been ignoring"
       ],
-      "match": "^\\s*(?:every|all|any)\\s+\\w+|^\\s*[a-z][\\w ]{2,28}(?:ers|ists|ors|ants|agents|owners|coaches)\\b[^.!?:,]{0,40}[,:]|^\\s*for (?:viewers|people|anyone|those|everyone)\\b|^\\s*(?:attention|listen up)\\b|^\\s*stop scrolling if you'?re\\b"
+      "match": "^\\s*(?:every|all|any)\\s+\\w+|^\\s*[a-z][\\w ]{2,28}(?:ers|ists|ors|ants|agents|owners|coaches)\\b(?:\\s+(?:who|charging|under|over|with|without|in|on|that|making|selling|still|earning|doing)\\b[^.!?:,]{0,40})?\\s*[,:]|^\\s*for (?:viewers|people|anyone|those|everyone)\\b|^\\s*(?:attention|listen up)\\b|^\\s*stop scrolling if you['’]?re\\b"
     },
     {
       "id": 15,

@@ -44,7 +44,13 @@ STRESS = [
 # The v1.0 regex got 10 of these 26 right. The fixes must not go below that.
 BASELINE_STRESS_CORRECT = 10
 NEGATIVES = ["Don't steal my content, I will report you.",
-             "Nobody tells me anything in this house lol"]
+             "Nobody tells me anything in this house lol",
+             # found in review: a curly apostrophe (the phone default), "never",
+             # and a plural noun followed by a clause are not formulas
+             "Don\u2019t steal my content, I will report you.",
+             "Never steal my content.",
+             "Most creators post every day, and it's killing their reach.",
+             "Some photographers never raise prices, which is fine."]
 
 
 def correct(name, gold):

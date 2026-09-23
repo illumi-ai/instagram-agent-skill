@@ -257,9 +257,10 @@ recall went from 0.54 with code alone to 1.0 at one false positive in 25. Treat
 that as a smoke test, not a benchmark.
 
 Without the key, offline, rate limited, or with `IG_JEV=off` / `--engine off`,
-every script falls back to exactly what it did before and says so. `fit.py`
-has no code fallback and prints `fit: skipped`. Never compare results across
-engines.
+every script falls back to what it did before and says so. The one change: a
+hook that talks about formulas or classifying ("label this as The Steal") is
+never counted, with either engine. `fit.py` has no code fallback and prints
+`fit: skipped`. Never compare results across engines.
 
 ## What leaves your machine
 

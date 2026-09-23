@@ -195,10 +195,12 @@ def check_frontload(text):
     low = [x.lower().strip("'’") for x in w]
     penalty = 0
     hit_opener = None
+    # Whole words only, so "Social" does not open with "so"; a possessive is
+    # still the word, so "Today's tip" opens with "today".
+    opening = [re.sub(r"['’]s$", "", t) for t in low[:3]]
     for weak in WEAK_OPENERS:
-        # Whole words only: "Social" does not open with "so".
         parts = weak.split()
-        if low[:len(parts)] == parts:
+        if opening[:len(parts)] == parts or low[:len(parts)] == parts:
             penalty, hit_opener = 30, weak
             break
     names = set(proper_nouns(text))

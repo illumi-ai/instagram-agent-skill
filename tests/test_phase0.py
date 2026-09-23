@@ -27,7 +27,9 @@ class HookscoreFrontload(unittest.TestCase):
         hs = load("hookscore")
         for hook in ["So today I want to talk about pricing.",
                      "Just a quick one about invoices.",
-                     "I want to show you my desk setup."]:
+                     "I want to show you my desk setup.",
+                     "Today's tip: raise your prices by $500.",
+                     "In today's video I cover pricing."]:
             _, detail = hs.check_frontload(hook)
             self.assertIn("weak opener", detail, hook)
 

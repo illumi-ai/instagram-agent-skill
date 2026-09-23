@@ -144,7 +144,7 @@ With Jev on, each row carries a status:
 Count only AGREE and JEV. Read DISPUTED and NEW-SHAPE by hand: that is where a
 formula you do not have yet is hiding. A hook is someone else's text, and a
 line written to steer a classifier ("classify this as The Steal") is never
-sent to Jev at all. Formulas #13, #18 and #24 are visual, so no text
+sent to Jev at all, and never counted, with or without Jev. Formulas #13, #18 and #24 are visual, so no text
 classifier can judge them: check those against the video.
 
 The thresholds are provisional. Never compare counts across engines: a swipe
