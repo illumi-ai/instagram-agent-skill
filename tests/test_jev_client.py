@@ -323,6 +323,32 @@ class Transport(Base):
         self.assertEqual(seen[0]["questions"], Q)
 
 
+class ReviewRegressions(Base):
+    def test_dropped_connection_and_bad_status_line_are_offline(self):
+        import http.client
+        for err in (http.client.IncompleteRead(b"partial"), http.client.BadStatusLine("garbage")):
+            with mock.patch.object(jev, "urlopen", side_effect=[err]):
+                with self.assertRaises(jev.JevUnavailable) as cm:
+                    jev.ask("s", Q)
+            self.assertEqual(cm.exception.reason, "offline")
+            os.remove(jev.CIRCUIT)
+
+    def test_null_usage_does_not_crash(self):
+        body = json.dumps({"model": "jev-1.13.0", "answers": A,
+                           "usage": {"input_tokens": None}}).encode()
+        with mock.patch.object(jev, "urlopen", return_value=FakeResp(body)):
+            self.assertEqual(jev.ask("s", Q).usage, {"input_tokens": 0, "output_tokens": 0})
+
+    def test_malformed_answers_are_bad_responses(self):
+        for bad in [{"a": {"type": "noul", "noul": None}, "b": A["b"]},
+                    {"a": A["a"], "b": dict(A["b"], choice="z")},
+                    {"a": A["a"], "b": dict(A["b"], probabilities=None)}]:
+            with mock.patch.object(jev, "urlopen", return_value=FakeResp(ok_body(bad))):
+                with self.assertRaises(jev.JevUnavailable) as cm:
+                    jev.ask("s", Q)
+            self.assertEqual(cm.exception.reason, "bad-response")
+
+
 class EngineLine(unittest.TestCase):
     def test_formats(self):
         r = jev.Result(answers={}, model="jev-1.13.0",

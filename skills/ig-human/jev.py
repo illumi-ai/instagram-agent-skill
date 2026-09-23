@@ -29,6 +29,7 @@ response bodies to stderr (never the headers); it is off by default because
 the bodies contain your drafts.
 """
 
+import http.client
 import json
 import os
 import re
@@ -182,7 +183,10 @@ def _http_post(body, timeout):
         except ssl.SSLError as e:
             _trip()
             raise JevUnavailable("offline", f"tls: {e}")
-        except (socket.timeout, TimeoutError, ConnectionError, OSError) as e:
+        except (socket.timeout, TimeoutError, ConnectionError, OSError,
+                http.client.HTTPException) as e:
+            # HTTPException covers a connection dropped mid-body (IncompleteRead)
+            # and a garbled status line.
             _trip()
             raise JevUnavailable("offline", str(e) or type(e).__name__)
         _reset()
@@ -221,9 +225,39 @@ def _check(resp, questions):
         a = answers.get(qid)
         if not isinstance(a, dict):
             raise JevUnavailable("bad-response", f"no answer for {qid}")
-        if a.get("type") != q.get("type") or q.get("type") not in a:
-            raise JevUnavailable("bad-response", f"answer for {qid} is not a {q.get('type')}")
+        kind = q.get("type")
+        if a.get("type") != kind or not _well_formed(kind, a, q):
+            raise JevUnavailable("bad-response", f"answer for {qid} is not a well-formed {kind}")
     return answers
+
+
+def _number(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+
+def _well_formed(kind, a, q):
+    """The fields the scripts read are present and typed, so a malformed answer
+    becomes a fallback rather than a crash."""
+    if kind == "noul":
+        return _number(a.get("noul"))
+    if kind == "choice":
+        probs = a.get("probabilities")
+        return (a.get("choice") in (q.get("criteria") or {}) and isinstance(probs, dict)
+                and all(_number(v) for v in probs.values()) and _number(a.get("confidence")))
+    if kind == "score":
+        return _number(a.get("score"))
+    return False
+
+
+def _usage(resp):
+    usage = resp.get("usage") if isinstance(resp.get("usage"), dict) else {}
+    out = {}
+    for k in ("input_tokens", "output_tokens"):
+        try:
+            out[k] = int(usage.get(k) or 0)
+        except (TypeError, ValueError):
+            out[k] = 0
+    return out
 
 
 def ask(state, questions, *, engine=None, timeout=6.0):
@@ -237,11 +271,8 @@ def ask(state, questions, *, engine=None, timeout=6.0):
     elapsed = time.monotonic() - t0
     _debug("response", resp)
     answers = _check(resp, questions)
-    usage = resp.get("usage") or {}
     return Result(answers={k: answers[k] for k in questions}, model=resp["model"],
-                  usage={"input_tokens": int(usage.get("input_tokens", 0)),
-                         "output_tokens": int(usage.get("output_tokens", 0))},
-                  elapsed_s=elapsed, requests=1)
+                  usage=_usage(resp), elapsed_s=elapsed, requests=1)
 
 
 def _merge(results):
